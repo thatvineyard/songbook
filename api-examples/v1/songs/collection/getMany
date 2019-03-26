@@ -1,0 +1,60 @@
+-- REQUEST
+{{url}}/songs/collection
+BODY:
+{
+	"refs": [
+		"abc001"
+		]
+}
+
+
+-- RESPONSE
+STATUS: 200
+BODY:
+{
+	"results": [
+	    {
+	    	"song": {
+		    	"metadata": {
+					"title": "Song 1",
+					"artistRef": "jkl567",
+					"melodyRef": "xyz789"
+		    	},
+		    	"lyrics": [
+					{
+		    			"type": "verse",
+		    			"id": "001",
+		    			"lines": [
+		    				"Helan går",
+		    				"Hej hopp"
+		    				]
+		    		},
+					{
+		    			"type": "chorus",
+		    			"id": "002",
+		    			"lines": [
+		    				"Halvan gick",
+		    				"Hoppsan sa"
+		    				]
+		    		},
+		    		{
+		    			"type": "ref",
+		    			"ref": "002"
+		    		}
+		    	]
+		    },
+		    "id": "abc001",
+		    "created": "2019-03-20T09:30:23+01:00",
+		    "revision": "2",
+		    "lastModified": "2019-03-21T10:34:12+01:00"
+	    }
+	],
+    // responseDetails might be overkill for version 1. 
+	"responseDetails": {
+		"amount": "1",
+		"sort": "alpha",
+		"timestamp": "2019-04-04T19:22:01+01:00",
+		"fieldWhitelist": "none",
+		"fieldBlacklist": "none"
+	}
+}
