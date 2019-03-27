@@ -1,10 +1,11 @@
 import express, { Request, Response } from 'express';
 import serverConstants from '../../constants/serverConstants';
+import { Song } from '../../models/song';
 
 const songsRouter = express.Router();
 
 function getSongCollection(req: Request, res: Response): void {
-  res.send(['song001', 'song002', 'song003']);
+  res.send([new Song('song001'), new Song('song002'), new Song('song003')]);
 }
 
 function getSongIndex(req: Request, res: Response): void {
