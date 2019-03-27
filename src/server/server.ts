@@ -1,17 +1,13 @@
-import { Router, Request, Response } from 'express';
+import express from 'express';
 
-const express = require('express');
-const serverConstants = require('../constants/serverConstants');
-const router = require('./routes/router');
+import serverConstants from '../constants/serverConstants';
+import router from './router';
 
 
 // App
 const app = express();
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello songbook\n');
-});
 
-app.use('/', router);
+app.use(serverConstants.rootUrl, router);
 
-app.listen(serverConstants.port, serverConstants.host);
+app.listen(serverConstants.port);
 console.log(`Running on http://${serverConstants.host}:${serverConstants.port}`);

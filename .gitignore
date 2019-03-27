@@ -62,3 +62,6 @@ typings/
 
 # vs code
 .vscode
+
+# build files
+out/
