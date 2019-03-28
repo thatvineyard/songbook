@@ -3,34 +3,45 @@ import { entryData } from "./entryData";
 import { songEntryData } from "./songEntryData";
 import { id } from "./id";
 
-export class database {
+export class databaseHandler {
+  private static _instance: databaseHandler;
 
-  private static _instance: database;
-
-  private entries: entry[];
+  private songDatabase: entry[];
+  private melodyDatabase: entry[];
+  private artistDatabase: entry[];
 
   private constructor() {
-    this.entries = [];
-    this.createEntry(new songEntryData());
+    this.songDatabase = [];
+    this.createSong(new songEntryData());
+    console.log(this.getSongsIndex());
   }
 
   public static get Instance() {
     return this._instance || (this._instance = new this());
   }
 
-  public createEntry(entryData: entryData) {
-    this.entries.push(new entry(entryData));
+  public createSong(entryData: songEntryData) {
+    this.songDatabase.push(new entry(entryData));
   }
 
-  public hasEntry(id: id) {
-    this.entries.forEach(entry => {
-      if (entry.id.toString() === id.toString()) { return true; }
+  public hasSong(id: id) {
+    this.songDatabase.forEach(entry => {
+      if (entry.id.toString() === id.toString()) {
+        return true;
+      }
     });
     return false;
   }
 
-  public getEntries() {
-    return this.entries;
+  public getSongs() {
+    return this.songDatabase;
   }
 
+  private getIndex(entry: Entry) {
+    return entry.id;
+  }
+
+  public getSongsIndex() {
+    return this.songDatabase.map(getIndex);
+  }
 }
