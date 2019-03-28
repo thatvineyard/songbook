@@ -39,7 +39,6 @@ The api information shows:
 
 - songs
   - collection
-    - 
   - index
   - actions
 - artists
