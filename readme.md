@@ -1,7 +1,8 @@
 # Songbook
  
-[TOC]
-
+## Table of Contents
+- [API](#API)
+  - [v1](#v1)
 
 ## API
 
