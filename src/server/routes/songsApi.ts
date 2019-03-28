@@ -1,6 +1,14 @@
 import express, { Request, Response } from 'express';
 import serverConstants from '../../constants/serverConstants';
 import { database } from '../../database/database';
+import { ApiBuilder } from '../ApiBuilder';
+
+
+
+export let songsApiBuilder: ApiBuilder = new ApiBuilder('');
+
+
+songsApiBuilder.addGet(serverConstants.indexUrl, getSongIndex);
 
 const songsRouter = express.Router();
 
