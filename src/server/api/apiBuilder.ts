@@ -16,7 +16,7 @@ export class ApiBuilder {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.methods.push(
       new Method(

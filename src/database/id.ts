@@ -1,7 +1,6 @@
 import { randomBytes } from "crypto";
 
 export class id {
-
   private type: string;
   private id: string;
 
@@ -11,10 +10,10 @@ export class id {
   }
 
   private generateId(): string {
-    return randomBytes(4).toString('hex');
+    return randomBytes(4).toString("hex");
   }
 
   public toString(): string {
-    return this.type.substr(0, 1) + '-' + this.id;
+    return this.type + "-" + this.id;
   }
 }

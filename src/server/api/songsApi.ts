@@ -1,9 +1,91 @@
 import express, { Request, Response } from "express";
 import serverConstants from "../../constants/serverConstants";
-import { databaseHandler } from "../../database/database";
-import { ApiBuilder } from "./apiBuilder";
+import { DatabaseHandler } from "../../database/database";
+import { ApiBuilder, Parameter, ParameterType } from "./apiBuilder";
+import { request } from "http";
+import * as Status from "http-status-codes";
 
 export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
+
+// common params
+let paramTitle = new Parameter(ParameterType.BODY, "title", "string");
+let paramId = new Parameter(ParameterType.BODY, "id", "string");
+
+/**
+ * PUT SONGS
+ */
+
+// Function
+function putSong(req: Request, res: Response): void {
+  if (!req.body.id) {
+    res.status(Status.UNPROCESSABLE_ENTITY).send("Missing mandatory field: id");
+  } else {
+    let id = req.body.id;
+
+    let db = DatabaseHandler.Instance;
+    res.send(db.getSongs());
+  }
+}
+
+// Params
+let putSongParams: Parameter[] = [paramId, paramTitle];
+
+// API
+songsApiBuilder.addPut("", putSong, "Put song", putSongParams);
+
+/**
+ * POST SONGS
+ */
+
+// Function
+function postSong(req: Request, res: Response): void {
+  if (!req.body.title) {
+    res
+      .status(Status.UNPROCESSABLE_ENTITY)
+      .send("Missing mandatory field: title");
+  } else {
+    let title = req.body.title;
+
+    let db = DatabaseHandler.Instance;
+    let id = db.postSong(title);
+
+    res.status(Status.CREATED).send(id);
+  }
+}
+
+// Params
+let postSongParams: Parameter[] = [paramTitle];
+
+// API
+songsApiBuilder.addPost("", postSong, "Post song", postSongParams);
+
+/**
+ * DELETE SONG
+ */
+
+// Function
+function deleteSong(req: Request, res: Response): void {
+  if (!req.body.id) {
+    res.status(Status.UNPROCESSABLE_ENTITY).send("Missing mandatory field: id");
+  } else {
+    let id = req.body.id;
+
+    let db = DatabaseHandler.Instance;
+    let success = db.deleteSong(id);
+
+    if (success) {
+      res.status(Status.NO_CONTENT).send();
+    } else {
+      res.status(Status.NOT_FOUND).send();
+    }
+  }
+}
+
+// Params
+let deleteSongParams: Parameter[] = [paramId];
+
+// API
+songsApiBuilder.addDelete("", deleteSong, "Delete song", deleteSongParams);
 
 /**
  * GET SONGS COLLECTION
@@ -11,9 +93,11 @@ export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
 
 // Function
 function getSongsCollection(req: Request, res: Response): void {
-  let db = databaseHandler.Instance;
+  let db = DatabaseHandler.Instance;
   res.send(db.getSongs());
 }
+
+// API
 songsApiBuilder.addGet(
   serverConstants.collectionUrl,
   getSongsCollection,
@@ -26,7 +110,8 @@ songsApiBuilder.addGet(
 
 // Function
 function getSongsIndex(req: Request, res: Response): void {
-  res.send(["s001", "s002", "s003"]);
+  let db = DatabaseHandler.Instance;
+  res.send(db.getSongsIndex());
 }
 songsApiBuilder.addGet(
   serverConstants.indexUrl,

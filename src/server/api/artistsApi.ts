@@ -14,13 +14,18 @@ function getArtistsCollection(req: Request, res: Response): void {
 }
 
 // Parameters
-let paramHello = new Parameter(ParameterType.BODY, "hello", "string");
-let paramGoodbye = new Parameter(ParameterType.BODY, "goodbye", "boolean");
+let paramHello: Parameter = new Parameter(
+  ParameterType.BODY,
+  "hello",
+  "string"
+);
+let paramGoodbye: Parameter = new Parameter(
+  ParameterType.BODY,
+  "goodbye",
+  "boolean"
+);
 paramHello.addDependency(paramGoodbye, "true");
-let getArtistsCollectionParameters = {
-  paramHello,
-  paramGoodbye
-};
+let getArtistsCollectionParameters: Parameter[] = [paramHello, paramGoodbye];
 
 // API
 artistsApiBuilder.addGet(

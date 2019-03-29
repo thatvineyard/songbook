@@ -2,7 +2,7 @@ import express, { Express } from "express";
 import { createApi } from "./api/api";
 
 import serverConstants from "../constants/serverConstants";
-import { start } from "repl";
+import bodyParser = require("body-parser");
 
 // App
 export class Server {
@@ -10,6 +10,7 @@ export class Server {
 
   constructor() {
     this.express = express();
+    this.express.use(bodyParser.json());
     this.express.use("/", createApi());
   }
 
