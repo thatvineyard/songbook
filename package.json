@@ -2,11 +2,13 @@
   "name": "songbook",
   "version": "1.0.0",
   "description": "A registry for storing lyrics and melodies of songs. ",
-  "main": "server/server.ts",
+  "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpileOnly ./src/server/server.ts",
-    "prod": "tsc && node ./server/server.js"
+    "dev": "ts-node-dev --respawn --transpileOnly ./src/app.ts",
+    "prod": "tsc && node ./out/app.js",
+    "start": "node ./out/app.js",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",

@@ -14,7 +14,7 @@ export class ApiBuilder {
   addMethod(
     httpMethod: HttpMethod,
     url: string,
-    handlers: RequestHandler[],
+    handlers: RequestHandler,
     description?: string,
     parameters?: string[]
   ) {
@@ -31,7 +31,7 @@ export class ApiBuilder {
 
   addGet(
     url: string,
-    handlers: RequestHandler[],
+    handlers: RequestHandler,
     description?: string,
     parameters?: string[]
   ) {
@@ -40,7 +40,7 @@ export class ApiBuilder {
 
   addPost(
     url: string,
-    handlers: RequestHandler[],
+    handlers: RequestHandler,
     description?: string,
     parameters?: string[]
   ) {
@@ -49,7 +49,7 @@ export class ApiBuilder {
 
   addPut(
     url: string,
-    handlers: RequestHandler[],
+    handlers: RequestHandler,
     description?: string,
     parameters?: string[]
   ) {
@@ -58,7 +58,7 @@ export class ApiBuilder {
 
   addOptions(
     url: string,
-    handlers: RequestHandler[],
+    handlers: RequestHandler,
     description?: string,
     parameters?: string[]
   ) {
@@ -67,7 +67,7 @@ export class ApiBuilder {
 
   addHead(
     url: string,
-    handlers: RequestHandler[],
+    handlers: RequestHandler,
     description?: string,
     parameters?: string[]
   ) {
@@ -76,7 +76,7 @@ export class ApiBuilder {
 
   addConnect(
     url: string,
-    handlers: RequestHandler[],
+    handlers: RequestHandler,
     description?: string,
     parameters?: string[]
   ) {
@@ -85,7 +85,7 @@ export class ApiBuilder {
 
   addPatch(
     url: string,
-    handlers: RequestHandler[],
+    handlers: RequestHandler,
     description?: string,
     parameters?: string[]
   ) {
@@ -94,7 +94,7 @@ export class ApiBuilder {
 
   addDelete(
     url: string,
-    handlers: RequestHandler[],
+    handlers: RequestHandler,
     description?: string,
     parameters?: string[]
   ) {
@@ -103,7 +103,7 @@ export class ApiBuilder {
 
   addTrace(
     url: string,
-    handlers: RequestHandler[],
+    handlers: RequestHandler,
     description?: string,
     parameters?: string[]
   ) {
@@ -186,16 +186,16 @@ export enum HttpMethod {
 class Method {
   httpMethod: HttpMethod;
   url: string;
-  description: string;
-  parameters: string[];
-  handlers: RequestHandler[];
+  description: string | undefined;
+  parameters: string[] | undefined;
+  handlers: RequestHandler;
 
   constructor(
     method: HttpMethod,
     url: string,
-    handlers: RequestHandler[],
-    description: string,
-    parameters: string[]
+    handlers: RequestHandler,
+    description?: string,
+    parameters?: string[]
   ) {
     this.httpMethod = method;
     this.url = url;

@@ -1,14 +1,22 @@
-import express from "express";
+import express, { Express } from "express";
 import { createApi } from "./api/api";
 
 import serverConstants from "../constants/serverConstants";
+import { start } from "repl";
 
 // App
-const app = express();
+export class Server {
+  express: Express;
 
-app.use("/", createApi());
+  constructor() {
+    this.express = express();
+    this.express.use("/", createApi());
+  }
 
-app.listen(serverConstants.port);
-console.log(
-  `Running on http://${serverConstants.host}:${serverConstants.port}`
-);
+  start() {
+    this.express.listen(serverConstants.port);
+    console.log(
+      `Running on http://${serverConstants.host}:${serverConstants.port}`
+    );
+  }
+}

@@ -2,8 +2,7 @@ import { entryData } from "./entryData";
 import { randomBytes } from "crypto";
 import { id } from "./id";
 
-export class entry {
-
+export class Entry {
   id: id;
   type: string;
   revision: number;
@@ -25,5 +24,4 @@ export class entry {
     this.revision++;
     this.lastModified = new Date();
   }
-
 }
