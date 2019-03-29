@@ -33,7 +33,7 @@ export class ApiBuilder {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.addMethod(HttpMethod.GET, url, handlers, description, parameters);
   }
@@ -42,7 +42,7 @@ export class ApiBuilder {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.addMethod(HttpMethod.POST, url, handlers, description, parameters);
   }
@@ -51,7 +51,7 @@ export class ApiBuilder {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.addMethod(HttpMethod.PUT, url, handlers, description, parameters);
   }
@@ -60,7 +60,7 @@ export class ApiBuilder {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.addMethod(HttpMethod.OPTIONS, url, handlers, description, parameters);
   }
@@ -69,7 +69,7 @@ export class ApiBuilder {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.addMethod(HttpMethod.HEAD, url, handlers, description, parameters);
   }
@@ -78,7 +78,7 @@ export class ApiBuilder {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.addMethod(HttpMethod.CONNECT, url, handlers, description, parameters);
   }
@@ -87,7 +87,7 @@ export class ApiBuilder {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.addMethod(HttpMethod.PATCH, url, handlers, description, parameters);
   }
@@ -96,7 +96,7 @@ export class ApiBuilder {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.addMethod(HttpMethod.DELETE, url, handlers, description, parameters);
   }
@@ -105,7 +105,7 @@ export class ApiBuilder {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.addMethod(HttpMethod.TRACE, url, handlers, description, parameters);
   }
@@ -163,6 +163,7 @@ export class ApiBuilder {
     let router = express.Router();
 
     console.debug(this.methods.join("\n"));
+    console.dir(this.methods, { depth: null });
     this.methods.forEach(method => {
       this.addMethodToRouter(router, method);
     });
@@ -187,7 +188,7 @@ class Method {
   httpMethod: HttpMethod;
   url: string;
   description: string | undefined;
-  parameters: string[] | undefined;
+  parameters: Parameter[] | undefined;
   handlers: RequestHandler;
 
   constructor(
@@ -195,7 +196,7 @@ class Method {
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: string[]
+    parameters?: Parameter[]
   ) {
     this.httpMethod = method;
     this.url = url;
@@ -206,5 +207,30 @@ class Method {
 
   public toString() {
     return this.httpMethod + ": " + this.url;
+  }
+}
+
+export enum ParameterType {
+  QUERY = "QUERY",
+  BODY = "BODY"
+}
+
+export class Parameter {
+  parameterType: ParameterType;
+  name: string;
+  objectType: string;
+  dependencies: string[];
+
+  constructor(type: ParameterType, name: string, objectType: string) {
+    this.parameterType = type;
+    this.name = name;
+    this.objectType = objectType;
+    this.dependencies = [];
+  }
+
+  public addDependency(dependency: Parameter, value?: string) {
+    this.dependencies.push(
+      dependency.name + (value != null ? "(" + value + ")" : "")
+    );
   }
 }

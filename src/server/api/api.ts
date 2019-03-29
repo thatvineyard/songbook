@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import { ApiBuilder } from "./apiBuilder";
 import serverConstants from "../../constants/serverConstants";
 import { songsApiBuilder } from "./songsApi";
@@ -15,6 +15,13 @@ export function createApi(): Router {
   apiBuilder.subApi(songsUrl, songsApiBuilder);
   apiBuilder.subApi(melodiesUrl, melodiesApiBuilder);
   apiBuilder.subApi(artistsUrl, artistsApiBuilder);
+
+  apiBuilder.addGet(serverConstants.apiInfoUrl, function A(
+    req: Request,
+    res: Response
+  ) {
+    res.send(apiBuilder.methods);
+  });
 
   return apiBuilder.buildRouter();
 }

@@ -5,33 +5,45 @@ import { ApiBuilder } from "./apiBuilder";
 
 export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
 
-songsApiBuilder.addGet(
-  serverConstants.indexUrl,
-  getSongIndex,
-  "Get song index"
-);
-songsApiBuilder.addGet(
-  serverConstants.collectionUrl,
-  getSongCollection,
-  "Get song collection"
-);
-songsApiBuilder.addGet(
-  serverConstants.actionUrl,
-  getSongAction,
-  "Temporary action"
-);
+/**
+ * GET SONGS COLLECTION
+ */
 
-const songsRouter = express.Router();
-
-function getSongCollection(req: Request, res: Response): void {
+// Function
+function getSongsCollection(req: Request, res: Response): void {
   let db = databaseHandler.Instance;
   res.send(db.getSongs());
 }
+songsApiBuilder.addGet(
+  serverConstants.collectionUrl,
+  getSongsCollection,
+  "Get song collection"
+);
 
-function getSongIndex(req: Request, res: Response): void {
+/**
+ * GET SONGS INDEX
+ */
+
+// Function
+function getSongsIndex(req: Request, res: Response): void {
   res.send(["s001", "s002", "s003"]);
 }
+songsApiBuilder.addGet(
+  serverConstants.indexUrl,
+  getSongsIndex,
+  "Get song index"
+);
 
-function getSongAction(req: Request, res: Response): void {
+/**
+ * GET SONGS ACTION
+ */
+
+// Function
+function getSongsAction(req: Request, res: Response): void {
   res.send("Action performed");
 }
+songsApiBuilder.addGet(
+  serverConstants.actionUrl,
+  getSongsAction,
+  "Temporary action"
+);
