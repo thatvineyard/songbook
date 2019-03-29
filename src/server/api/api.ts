@@ -1,9 +1,10 @@
-import { Router, Request, Response } from "express";
+import express, { Router, Request, Response } from "express";
 import { ApiBuilder } from "./apiBuilder";
 import serverConstants from "../../constants/serverConstants";
 import { songsApiBuilder } from "./songsApi";
 import { melodiesApiBuilder } from "./melodiesApi";
 import { artistsApiBuilder } from "./artistsApi";
+import { NextFunction } from "connect";
 
 const songsUrl = "/songs";
 const artistsUrl = "/artists";
@@ -23,5 +24,16 @@ export function createApi(): Router {
     res.send(apiBuilder.methods);
   });
 
-  return apiBuilder.buildRouter();
+  let router: Router = express.Router();
+  router.use((req: Request, res: Response, next: NextFunction) => {
+    res = apiBuilder.validate(req, res, apiBuilder.methods);
+    if (res.statusCode / 100 === 2) {
+      next();
+    } else {
+      res.send();
+    }
+  });
+  apiBuilder.configureRouter(router);
+  return router;
+  // return apiBuilder.buildRouter();
 }

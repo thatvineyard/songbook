@@ -1,4 +1,12 @@
-import express, { Request, Response, Router, RequestHandler } from "express";
+import express, {
+  Request,
+  Response,
+  Router,
+  RequestHandler,
+  NextFunction
+} from "express";
+import * as Status from "http-status-codes";
+import { RSA_NO_PADDING } from "constants";
 
 export class ApiBuilder {
   contextRoot: string;
@@ -159,14 +167,60 @@ export class ApiBuilder {
     });
   }
 
-  public buildRouter(): Router {
-    let router = express.Router();
+  private validateParameters(
+    req: Request,
+    res: Response,
+    methods: Method[]
+  ): Response {
+    let url = req.url;
+    let httpMethod = req.method;
 
+    let missingParams: Parameter[] = [];
+    this.methods.forEach(method => {
+      if (method.url === url && method.httpMethod === httpMethod) {
+        console.log("MATCH");
+        method.parameters.forEach(parameter => {
+          console.log(parameter);
+          if (!parameter.validateRequest(req)) {
+            missingParams.push(parameter);
+          }
+        });
+      }
+    });
+
+    console.log(missingParams);
+
+    if (missingParams.length != 0) {
+      res.status(Status.UNPROCESSABLE_ENTITY).write(
+        JSON.stringify({
+          missing: missingParams.map(param => {
+            return param.toString();
+          })
+        })
+      );
+    }
+
+    return res;
+  }
+
+  public validate(req: Request, res: Response, methods: Method[]): Response {
+    res = this.validateParameters(req, res, methods);
+
+    return res;
+  }
+
+  public configureRouter(router: Router): void {
     console.debug(this.methods.join("\n"));
     console.dir(this.methods, { depth: null });
     this.methods.forEach(method => {
       this.addMethodToRouter(router, method);
     });
+  }
+
+  public buildRouter(): Router {
+    let router = express.Router();
+
+    this.configureRouter(router);
 
     return router;
   }
@@ -187,8 +241,8 @@ export enum HttpMethod {
 class Method {
   httpMethod: HttpMethod;
   url: string;
-  description: string | undefined;
-  parameters: Parameter[] | undefined;
+  description: string;
+  parameters: Parameter[];
   handlers: RequestHandler;
 
   constructor(
@@ -200,8 +254,8 @@ class Method {
   ) {
     this.httpMethod = method;
     this.url = url;
-    this.description = description;
-    this.parameters = parameters;
+    this.description = description || "";
+    this.parameters = parameters || [];
     this.handlers = handlers;
   }
 
@@ -219,18 +273,58 @@ export class Parameter {
   parameterType: ParameterType;
   name: string;
   objectType: string;
-  dependencies: string[];
+  required: boolean;
+  dependencies: Parameter[];
 
-  constructor(type: ParameterType, name: string, objectType: string) {
+  constructor(
+    type: ParameterType,
+    name: string,
+    objectType: string,
+    required?: boolean
+  ) {
     this.parameterType = type;
     this.name = name;
     this.objectType = objectType;
+    this.required = required || false;
     this.dependencies = [];
   }
 
   public addDependency(dependency: Parameter, value?: string) {
-    this.dependencies.push(
-      dependency.name + (value != null ? "(" + value + ")" : "")
+    this.dependencies.push(dependency);
+  }
+
+  public validateRequest(req: Request): boolean {
+    let result = true;
+
+    if (this.required) {
+      if (!req.body[this.name]) {
+        result = false;
+      }
+    } else {
+      if (req.body[name]) {
+        this.dependencies.forEach(dependency => {
+          if (!dependency.validateRequestForceRequired(req)) {
+            result = false;
+          }
+        });
+      }
+    }
+    return result;
+  }
+
+  public validateRequestForceRequired(req: Request): boolean {
+    return !(req.body[name] === null);
+  }
+
+  public toString(): string {
+    return (
+      "(" +
+      this.parameterType.toString() +
+      ") - " +
+      this.name +
+      " (" +
+      this.objectType +
+      ")"
     );
   }
 }

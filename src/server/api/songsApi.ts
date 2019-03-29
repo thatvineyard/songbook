@@ -8,8 +8,8 @@ import * as Status from "http-status-codes";
 export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
 
 // common params
-let paramTitle = new Parameter(ParameterType.BODY, "title", "string");
-let paramId = new Parameter(ParameterType.BODY, "id", "string");
+let paramTitle = new Parameter(ParameterType.BODY, "title", "string", true);
+let paramId = new Parameter(ParameterType.BODY, "id", "string", true);
 
 /**
  * PUT SONGS
