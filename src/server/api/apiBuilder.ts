@@ -178,17 +178,13 @@ export class ApiBuilder {
     let missingParams: Parameter[] = [];
     this.methods.forEach(method => {
       if (method.url === url && method.httpMethod === httpMethod) {
-        console.log("MATCH");
         method.parameters.forEach(parameter => {
-          console.log(parameter);
           if (!parameter.validateRequest(req)) {
             missingParams.push(parameter);
           }
         });
       }
     });
-
-    console.log(missingParams);
 
     if (missingParams.length != 0) {
       res.status(Status.UNPROCESSABLE_ENTITY).write(
@@ -244,19 +240,22 @@ class Method {
   description: string;
   parameters: Parameter[];
   handlers: RequestHandler;
+  permission: string;
 
   constructor(
     method: HttpMethod,
     url: string,
     handlers: RequestHandler,
     description?: string,
-    parameters?: Parameter[]
+    parameters?: Parameter[],
+    permission?: string
   ) {
     this.httpMethod = method;
     this.url = url;
     this.description = description || "";
     this.parameters = parameters || [];
     this.handlers = handlers;
+    this.permission = permission || "public";
   }
 
   public toString() {
@@ -301,7 +300,7 @@ export class Parameter {
         result = false;
       }
     } else {
-      if (req.body[name]) {
+      if (req.body[this.name]) {
         this.dependencies.forEach(dependency => {
           if (!dependency.validateRequestForceRequired(req)) {
             result = false;
@@ -313,7 +312,7 @@ export class Parameter {
   }
 
   public validateRequestForceRequired(req: Request): boolean {
-    return !(req.body[name] === null);
+    return !(req.body[this.name] === null);
   }
 
   public toString(): string {
@@ -327,4 +326,71 @@ export class Parameter {
       ")"
     );
   }
+}
+
+export let getApiParams: Parameter[] = [
+  new Parameter(ParameterType.BODY, "url", "string"),
+  new Parameter(ParameterType.BODY, "httpMethod", "enum (BODY, GET)"),
+  new Parameter(ParameterType.BODY, "permission", "string"),
+  new Parameter(
+    ParameterType.BODY,
+    "options",
+    "list of enum (brief, noParameters)"
+  )
+];
+
+export function getApiInfo(req: Request, res: Response, methods: Method[]) {
+  let result: Method[] = methods.slice(0);
+
+  // Filter URLs
+  if (req.body.url) {
+    let url = req.body.url;
+    result = result.filter(function(method: Method) {
+      // TODO: Rewrite this with split on urls so that it forces a match on each subpath
+      // eg: /ap should not match with /api
+      return method.url.startsWith(url);
+    });
+  }
+
+  // Filter http methods
+  if (req.body.httpMethod) {
+    let httpMethod = req.body.httpMethod;
+    result = result.filter(function(method: Method) {
+      return method.httpMethod === httpMethod;
+    });
+  }
+
+  // Filter permission
+  if (req.body.permission) {
+    let permission = req.body.permission;
+    result = result.filter(function(method: Method) {
+      return method.permission === permission;
+    });
+  }
+
+  // Options
+  if (req.body.options && Array.isArray(req.body.options)) {
+    let options: string = req.body.options;
+
+    options.forEach((option: string) => {
+      switch (option) {
+        case "brief":
+          result = result.map((method: Method) => {
+            return method.toString();
+          });
+          break;
+        case "noParameters":
+          result = result.map((method: Method) => {
+            if (method.parameters) {
+              method.parameters = [];
+              return method;
+            }
+          });
+
+          break;
+      }
+    });
+  }
+
+  res.send(result);
 }

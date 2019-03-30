@@ -1,5 +1,5 @@
 import express, { Router, Request, Response } from "express";
-import { ApiBuilder } from "./apiBuilder";
+import { ApiBuilder, getApiInfo, getApiParams } from "./apiBuilder";
 import serverConstants from "../../constants/serverConstants";
 import { songsApiBuilder } from "./songsApi";
 import { melodiesApiBuilder } from "./melodiesApi";
@@ -17,14 +17,17 @@ export function createApi(): Router {
   apiBuilder.subApi(melodiesUrl, melodiesApiBuilder);
   apiBuilder.subApi(artistsUrl, artistsApiBuilder);
 
-  apiBuilder.addGet(serverConstants.apiInfoUrl, function A(
-    req: Request,
-    res: Response
-  ) {
-    res.send(apiBuilder.methods);
-  });
+  apiBuilder.addGet(
+    serverConstants.apiInfoUrl,
+    function getApiInfoWrapper(req: Request, res: Response) {
+      getApiInfo(req, res, apiBuilder.methods);
+    },
+    "Get API info",
+    getApiParams
+  );
 
   let router: Router = express.Router();
+
   router.use((req: Request, res: Response, next: NextFunction) => {
     res = apiBuilder.validate(req, res, apiBuilder.methods);
     if (res.statusCode / 100 === 2) {
@@ -33,6 +36,7 @@ export function createApi(): Router {
       res.send();
     }
   });
+
   apiBuilder.configureRouter(router);
   return router;
   // return apiBuilder.buildRouter();
