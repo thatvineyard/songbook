@@ -1,3 +1,6 @@
+import { Parameter } from "./parameter";
+import { RequestHandler } from "express";
+
 export enum HttpMethod {
   GET = "GET",
   HEAD = "HEAD",

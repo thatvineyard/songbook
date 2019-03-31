@@ -9,14 +9,172 @@ export class ApiBuilder {
   contextRoot: string;
   methods: Method[];
   apiInfoEnabled: boolean;
+  apiInfoUrl: string | undefined;
+  validationActive: boolean;
 
   constructor(contextRoot: string) {
     this.contextRoot = contextRoot;
     this.methods = [];
-    this.apiInfoEnabled = true;
+    this.apiInfoEnabled = false;
+    this.apiInfoUrl = undefined;
+    this.validationActive = false;
   }
 
-  addMethod(
+  // SETTINGS
+  public enableApiInfo(url: string) {
+    this.apiInfoEnabled = true;
+    this.apiInfoUrl = url;
+  }
+
+  public activateValidation() {
+    this.validationActive = true;
+  }
+
+  // PLAN
+
+  /**
+   * Add an ApiBuilder object as a subapi.
+   *
+   * It will add all of that builder's methods, but not any of its settings.
+   *
+   * This will make a copy, not a reference, so make sure the subapi is fully defined before using this function.
+   *
+   * @param baseUrl The url which the subApi's methods will be organized under.
+   * @param newApi The configured ApiBuilder.
+   */
+  public subApi(baseUrl: string, newApi: ApiBuilder) {
+    let newMethods = newApi.methods.slice(0);
+
+    newMethods.forEach(method => {
+      method.url = baseUrl + method.url;
+      this.addMethod(
+        method.httpMethod,
+        method.url,
+        method.handlers,
+        method.description,
+        method.parameters
+      );
+    });
+  }
+
+  /**
+   * Adds a function at a certain url at the corresponding http method (this one is GET).
+   *
+   *
+   * @param url The url which the method listens to.
+   * @param handlers The function which  called by this method.
+   * @param description (Optional) A description of the method.
+   * @param parameters (Optional) Any parameters that the method expects.
+   */
+  public addGet(
+    url: string,
+    handlers: RequestHandler,
+    description?: string,
+    parameters?: Parameter[]
+  ) {
+    this.addMethod(HttpMethod.GET, url, handlers, description, parameters);
+  }
+
+  /**
+   * See @function addGet.
+   */
+  public addPost(
+    url: string,
+    handlers: RequestHandler,
+    description?: string,
+    parameters?: Parameter[]
+  ) {
+    this.addMethod(HttpMethod.POST, url, handlers, description, parameters);
+  }
+
+  /**
+   * See @function addGet.
+   */
+  public addPut(
+    url: string,
+    handlers: RequestHandler,
+    description?: string,
+    parameters?: Parameter[]
+  ) {
+    this.addMethod(HttpMethod.PUT, url, handlers, description, parameters);
+  }
+
+  /**
+   * See @function addGet.
+   */
+  public addOptions(
+    url: string,
+    handlers: RequestHandler,
+    description?: string,
+    parameters?: Parameter[]
+  ) {
+    this.addMethod(HttpMethod.OPTIONS, url, handlers, description, parameters);
+  }
+
+  /**
+   * See @function addGet.
+   */
+  public addHead(
+    url: string,
+    handlers: RequestHandler,
+    description?: string,
+    parameters?: Parameter[]
+  ) {
+    this.addMethod(HttpMethod.HEAD, url, handlers, description, parameters);
+  }
+
+  /**
+   * See @function addGet.
+   */
+  public addConnect(
+    url: string,
+    handlers: RequestHandler,
+    description?: string,
+    parameters?: Parameter[]
+  ) {
+    this.addMethod(HttpMethod.CONNECT, url, handlers, description, parameters);
+  }
+
+  /**
+   * See @function addGet.
+   */
+  public addPatch(
+    url: string,
+    handlers: RequestHandler,
+    description?: string,
+    parameters?: Parameter[]
+  ) {
+    this.addMethod(HttpMethod.PATCH, url, handlers, description, parameters);
+  }
+
+  /**
+   * See @function addGet.
+   */
+  public addDelete(
+    url: string,
+    handlers: RequestHandler,
+    description?: string,
+    parameters?: Parameter[]
+  ) {
+    this.addMethod(HttpMethod.DELETE, url, handlers, description, parameters);
+  }
+
+  /**
+   * See @function addGet.
+   */
+  public addTrace(
+    url: string,
+    handlers: RequestHandler,
+    description?: string,
+    parameters?: Parameter[]
+  ) {
+    this.addMethod(HttpMethod.TRACE, url, handlers, description, parameters);
+  }
+
+  /**
+   * See @function addGet.
+   */
+  private addMethod(
     httpMethod: HttpMethod,
     url: string,
     handlers: RequestHandler,
@@ -34,88 +192,23 @@ export class ApiBuilder {
     );
   }
 
-  addGet(
-    url: string,
-    handlers: RequestHandler,
-    description?: string,
-    parameters?: Parameter[]
-  ) {
-    this.addMethod(HttpMethod.GET, url, handlers, description, parameters);
+  // BUILD METHODS
+  public buildRouter(apiBuilder: ApiBuilder): Router {
+    if (this.apiInfoEnabled && typeof this.apiInfoUrl === "string") {
+      registerApiInfo(apiBuilder, this.apiInfoUrl);
+    }
+
+    let router: Router = express.Router();
+
+    if (this.validationActive) {
+      registerApiValidator(apiBuilder, router);
+    }
+
+    apiBuilder.configureRouter(router);
+    return router;
   }
 
-  addPost(
-    url: string,
-    handlers: RequestHandler,
-    description?: string,
-    parameters?: Parameter[]
-  ) {
-    this.addMethod(HttpMethod.POST, url, handlers, description, parameters);
-  }
-
-  addPut(
-    url: string,
-    handlers: RequestHandler,
-    description?: string,
-    parameters?: Parameter[]
-  ) {
-    this.addMethod(HttpMethod.PUT, url, handlers, description, parameters);
-  }
-
-  addOptions(
-    url: string,
-    handlers: RequestHandler,
-    description?: string,
-    parameters?: Parameter[]
-  ) {
-    this.addMethod(HttpMethod.OPTIONS, url, handlers, description, parameters);
-  }
-
-  addHead(
-    url: string,
-    handlers: RequestHandler,
-    description?: string,
-    parameters?: Parameter[]
-  ) {
-    this.addMethod(HttpMethod.HEAD, url, handlers, description, parameters);
-  }
-
-  addConnect(
-    url: string,
-    handlers: RequestHandler,
-    description?: string,
-    parameters?: Parameter[]
-  ) {
-    this.addMethod(HttpMethod.CONNECT, url, handlers, description, parameters);
-  }
-
-  addPatch(
-    url: string,
-    handlers: RequestHandler,
-    description?: string,
-    parameters?: Parameter[]
-  ) {
-    this.addMethod(HttpMethod.PATCH, url, handlers, description, parameters);
-  }
-
-  addDelete(
-    url: string,
-    handlers: RequestHandler,
-    description?: string,
-    parameters?: Parameter[]
-  ) {
-    this.addMethod(HttpMethod.DELETE, url, handlers, description, parameters);
-  }
-
-  addTrace(
-    url: string,
-    handlers: RequestHandler,
-    description?: string,
-    parameters?: Parameter[]
-  ) {
-    this.addMethod(HttpMethod.TRACE, url, handlers, description, parameters);
-  }
-
-  addMethodToRouter(router: Router, method: Method) {
+  private addMethodToRouter(router: Router, method: Method) {
     switch (method.httpMethod) {
       case HttpMethod.GET:
         router.get(method.url, method.handlers);
@@ -147,21 +240,6 @@ export class ApiBuilder {
       default:
         break;
     }
-  }
-
-  subApi(baseUrl: string, newApi: ApiBuilder) {
-    let newMethods = newApi.methods.slice(0);
-
-    newMethods.forEach(method => {
-      method.url = baseUrl + method.url;
-      this.addMethod(
-        method.httpMethod,
-        method.url,
-        method.handlers,
-        method.description,
-        method.parameters
-      );
-    });
   }
 
   private validateParameters(
@@ -196,28 +274,17 @@ export class ApiBuilder {
     return res;
   }
 
-  public validate(req: Request, res: Response, methods: Method[]): Response {
+  private validate(req: Request, res: Response, methods: Method[]): Response {
     res = this.validateParameters(req, res, methods);
 
     return res;
   }
 
-  public configureRouter(router: Router): void {
+  private configureRouter(router: Router): void {
     console.debug(this.methods.join("\n"));
-    console.dir(this.methods, { depth: null });
+    // console.dir(this.methods, { depth: null });
     this.methods.forEach(method => {
       this.addMethodToRouter(router, method);
     });
-  }
-
-  public buildRouter(apiBuilder: ApiBuilder): Router {
-    registerApiInfo(apiBuilder);
-
-    let router: Router = express.Router();
-
-    registerApiValidator(apiBuilder, router);
-
-    apiBuilder.configureRouter(router);
-    return router;
   }
 }

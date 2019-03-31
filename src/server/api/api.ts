@@ -8,6 +8,7 @@ import { songsApiBuilder } from "./songs-api";
 const songsUrl = "/songs";
 const artistsUrl = "/artists";
 const melodiesUrl = "/melodies";
+const apiInfoUrl = serverConstants.apiInfoUrl;
 
 export function createApi(): Router {
   const apiBuilder: ApiBuilder = new ApiBuilder(serverConstants.contextRoot);
@@ -16,6 +17,9 @@ export function createApi(): Router {
   apiBuilder.subApi(songsUrl, songsApiBuilder);
   apiBuilder.subApi(melodiesUrl, melodiesApiBuilder);
   apiBuilder.subApi(artistsUrl, artistsApiBuilder);
+
+  apiBuilder.enableApiInfo(apiInfoUrl);
+  apiBuilder.activateValidation();
 
   return apiBuilder.buildRouter(apiBuilder);
 }

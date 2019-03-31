@@ -1,6 +1,8 @@
 import serverConstants from "../../../constants/serverConstants";
 import { ApiBuilder } from "./api-builder";
 import { Parameter, ParameterType } from "./parameter";
+import { Request, Response } from "express";
+import { Method } from "./method";
 
 export let getApiParams: Parameter[] = [
   new Parameter(ParameterType.BODY, "url", "string"),
@@ -13,9 +15,9 @@ export let getApiParams: Parameter[] = [
   )
 ];
 
-export function registerApiInfo(apiBuilder: ApiBuilder): void {
+export function registerApiInfo(apiBuilder: ApiBuilder, url: string): void {
   apiBuilder.addGet(
-    serverConstants.apiInfoUrl,
+    url,
     function getApiInfoWrapper(req: Request, res: Response) {
       getApiInfo(req, res, apiBuilder.methods);
     },
@@ -26,6 +28,7 @@ export function registerApiInfo(apiBuilder: ApiBuilder): void {
 
 export function getApiInfo(req: Request, res: Response, methods: Method[]) {
   let result: Method[] = methods.slice(0);
+  let resultString: string[] = [];
 
   // Filter URLs
   if (req.body.url) {
@@ -55,21 +58,23 @@ export function getApiInfo(req: Request, res: Response, methods: Method[]) {
 
   // Options
   if (req.body.options && Array.isArray(req.body.options)) {
-    let options: string = req.body.options;
+    let options: string[] = req.body.options;
 
     options.forEach((option: string) => {
       switch (option) {
         case "brief":
-          result = result.map((method: Method) => {
-            return method.toString();
-          });
+          resultString = result.map(
+            (method: Method): string => {
+              return method.toString();
+            }
+          );
           break;
         case "noParameters":
           result = result.map((method: Method) => {
             if (method.parameters) {
               method.parameters = [];
-              return method;
             }
+            return method;
           });
 
           break;
@@ -77,5 +82,9 @@ export function getApiInfo(req: Request, res: Response, methods: Method[]) {
     });
   }
 
-  res.send(result);
+  if (resultString.length > 0) {
+    res.send(resultString);
+  } else {
+    res.send(result);
+  }
 }
