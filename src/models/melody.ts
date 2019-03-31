@@ -8,11 +8,11 @@
 
 // stanza types: verse, chorus, reference
 
-export class Song {
+export class Melody {
   title: String;
 
   constructor(title: String) {
-    console.log(" --> Creating Song");
+    console.log(" --> Creating melody");
     this.title = title;
   }
 

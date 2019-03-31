@@ -8,12 +8,14 @@
 
 // stanza types: verse, chorus, reference
 
-export class Song {
-  title: String;
+export class Artist {
+  firstName: string;
+  lastName: string;
 
-  constructor(title: String) {
-    console.log(" --> Creating Song");
-    this.title = title;
+  constructor(firstName: string, lastName: string) {
+    console.log(" --> Creating Artist");
+    this.firstName = firstName;
+    this.lastName = lastName;
   }
 
   // function addStanza (type: String, arrayOfLines) {

@@ -8,11 +8,11 @@ export class Entry {
   revision: number;
   created: Date;
   lastModified: Date;
-  entryData: entryData;
+  entryData: object;
 
-  constructor(entryData: entryData) {
+  constructor(entryData: object) {
     this.entryData = entryData;
-    this.type = entryData.getType();
+    this.type = entryData.constructor.name;
     this.id = new id(this.type).toString();
     this.revision = 1;
     this.created = new Date();

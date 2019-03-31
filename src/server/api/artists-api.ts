@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+import * as Status from "http-status-codes";
 import serverConstants from "../../constants/serverConstants";
+import { DatabaseHandler } from "../../database/database";
 import { ApiBuilder } from "./api-framework/api-builder";
 import { Parameter, ParameterType } from "./api-framework/parameter";
 
@@ -11,7 +13,9 @@ export let artistsApiBuilder: ApiBuilder = new ApiBuilder("");
 
 // Functions
 function getArtistsCollection(req: Request, res: Response): void {
-  res.send(["artist001, artist002, artist003"]);
+  let db = DatabaseHandler.Instance;
+
+  res.send(db.getArtists());
 }
 
 // Parameters
@@ -35,6 +39,31 @@ artistsApiBuilder.addGet(
   "Get artists collection",
   getArtistsCollectionParameters
 );
+
+/**
+ * POST ARTIST
+ */
+// Function
+function postArtist(req: Request, res: Response): void {
+  if (req.body.firstName && req.body.lastName) {
+    let firstName = req.body.firstName;
+    let lastName = req.body.lastName;
+
+    let db = DatabaseHandler.Instance;
+    let id = db.postArtist(firstName, lastName);
+
+    res.status(Status.CREATED).send(id);
+  }
+}
+
+// Params
+let postArtistParams: Parameter[] = [
+  new Parameter(ParameterType.BODY, "firstName", "string", true),
+  new Parameter(ParameterType.BODY, "lastName", "string", true)
+];
+
+// API
+artistsApiBuilder.addPost("", postArtist, "Post artist", postArtistParams);
 
 /**
  * GET ARTISTS INDEX

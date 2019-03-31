@@ -1,29 +1,28 @@
+import { Song } from "../models/song";
 import { Entry } from "./entry";
-import { entryData } from "./entryData";
-import { songEntryData } from "./songEntryData";
-import { id } from "./id";
+import { Artist } from "../models/artist";
 
 export class DatabaseHandler {
   private static _instance: DatabaseHandler;
 
-  private songDatabase: Entry[];
-  private melodyDatabase: Entry[];
-  private artistDatabase: Entry[];
+  private songDatabase: Database;
+  private melodyDatabase: Database;
+  private artistDatabase: Database;
 
   private constructor() {
-    this.songDatabase = [];
-    this.createSong(new songEntryData("Old song"));
+    this.songDatabase = new Database();
+    this.postSong("Old song");
     console.debug("# Song Database");
     console.debug(this.getSongsIndex());
     console.debug();
 
-    this.melodyDatabase = [];
-    // this.
+    this.melodyDatabase = new Database();
     console.debug("# Melody Database");
     console.debug(this.getMelodiesIndex());
     console.debug();
 
-    this.artistDatabase = [];
+    this.artistDatabase = new Database();
+    this.postArtist("Carl", "Wangman");
     console.debug("# Artist Database");
     console.debug(this.getArtistsIndex());
     console.debug();
@@ -33,20 +32,81 @@ export class DatabaseHandler {
     return this._instance || (this._instance = new this());
   }
 
-  private createSong(entryData: songEntryData) {
-    this.songDatabase.push(new Entry(entryData));
-  }
-
-  public postSong(title: string) {
-    let songEntry = new Entry(new songEntryData(title || ""));
-    this.songDatabase.push(songEntry);
-    console.log("Posting song (" + songEntry.id + ")");
-    return songEntry.id;
+  // SONG
+  public postSong(title: string): string {
+    let song = new Song(title);
+    return this.songDatabase.post(song);
   }
 
   public deleteSong(id: string) {
-    if (this.hasSong(id)) {
-      this.songDatabase = this.songDatabase.filter(entry => {
+    return this.songDatabase.delete(id);
+  }
+
+  public hasSong(id: string) {
+    return this.songDatabase.has(id);
+  }
+
+  public getSongs() {
+    return this.songDatabase.getCollection();
+  }
+
+  public getSongsIndex() {
+    return this.songDatabase.getIndex();
+  }
+
+  // ARTIST
+  public postArtist(firstName: string, lastName: string) {
+    let artist = new Artist(firstName, lastName);
+    return this.artistDatabase.post(artist);
+  }
+
+  public getArtists() {
+    return this.artistDatabase.getCollection();
+  }
+  public getArtistsIndex() {
+    return this.artistDatabase.getIndex();
+  }
+
+  // MELODY
+  public getMelodies() {
+    return this.melodyDatabase.getCollection();
+  }
+
+  public getMelodiesIndex() {
+    return this.melodyDatabase.getIndex();
+  }
+}
+
+class Database {
+  entryList: Entry[];
+
+  constructor() {
+    this.entryList = [];
+  }
+
+  public create(data: object): Entry {
+    let entry = new Entry(data);
+    this.entryList.push(new Entry(data));
+    return entry;
+  }
+
+  public getCollection() {
+    return this.entryList;
+  }
+
+  public getIndex() {
+    return this.entryList.map((entry: Entry) => {
+      return entry.id;
+    });
+  }
+
+  public post(data: object): string {
+    return this.create(data).id;
+  }
+
+  public delete(id: string) {
+    if (this.has(id)) {
+      this.entryList = this.entryList.filter(entry => {
         return !entry.idEquals(id);
       });
       return true;
@@ -55,45 +115,13 @@ export class DatabaseHandler {
     }
   }
 
-  public hasSong(id: string) {
+  public has(id: string) {
     let result = false;
-    this.songDatabase.forEach(entry => {
+    this.entryList.forEach(entry => {
       if (entry.idEquals(id)) {
         result = true;
       }
     });
     return result;
-  }
-
-  public songCount(id: string) {
-    let index = 0;
-    let result = -1;
-    this.songDatabase.forEach(entry => {
-      index++;
-      if (entry.id.toString() === id.toString()) {
-        result = index;
-      }
-    });
-    return result;
-  }
-
-  public getSongs() {
-    return this.songDatabase;
-  }
-
-  private getId(entry: Entry) {
-    return entry.id;
-  }
-
-  public getSongsIndex() {
-    return this.songDatabase.map(this.getId);
-  }
-
-  public getArtistsIndex() {
-    return this.artistDatabase.map(this.getId);
-  }
-
-  public getMelodiesIndex() {
-    return this.melodyDatabase.map(this.getId);
   }
 }
