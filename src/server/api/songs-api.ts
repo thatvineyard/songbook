@@ -4,6 +4,8 @@ import serverConstants from "../../constants/serverConstants";
 import { DatabaseHandler } from "../../database/database";
 import { ApiBuilder } from "./api-framework/api-builder";
 import { Parameter, ParameterType } from "./api-framework/parameter";
+import { create404, create422 } from "./error-handler/errorFactory";
+import { ErrorResponse } from "./error-handler/error-response";
 
 export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
 
@@ -38,17 +40,17 @@ songsApiBuilder.addPut("", putSong, "Put song", putSongParams);
 
 // Function
 function postSong(req: Request, res: Response): void {
-  if (!req.body.title) {
-    res
-      .status(Status.UNPROCESSABLE_ENTITY)
-      .send("Missing mandatory field: title");
-  } else {
+  if (req.body.title) {
     let title = req.body.title;
 
     let db = DatabaseHandler.Instance;
     let id = db.postSong(title);
 
     res.status(Status.CREATED).send(id);
+  } else {
+    create422(
+      "The body parameter title was " + typeof req.body.title
+    ).sendResponse(res);
   }
 }
 
@@ -64,9 +66,7 @@ songsApiBuilder.addPost("", postSong, "Post song", postSongParams);
 
 // Function
 function deleteSong(req: Request, res: Response): void {
-  if (!req.query.id) {
-    res.status(Status.UNPROCESSABLE_ENTITY).send("Missing mandatory field: id");
-  } else {
+  if (req.query.id) {
     let id = req.query.id;
 
     let db = DatabaseHandler.Instance;
@@ -75,8 +75,12 @@ function deleteSong(req: Request, res: Response): void {
     if (success) {
       res.status(Status.NO_CONTENT).send();
     } else {
-      res.status(Status.NOT_FOUND).send();
+      create404("No song found at id " + id).sendResponse(res);
     }
+  } else {
+    create422("The query parameter Id was " + typeof req.query.id).sendResponse(
+      res
+    );
   }
 }
 
