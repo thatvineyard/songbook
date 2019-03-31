@@ -12,10 +12,21 @@ export class DatabaseHandler {
 
   private constructor() {
     this.songDatabase = [];
-    this.melodyDatabase = [];
-    this.artistDatabase = [];
     this.createSong(new songEntryData("Old song"));
-    console.log(this.getSongsIndex());
+    console.debug("# Song Database");
+    console.debug(this.getSongsIndex());
+    console.debug();
+
+    this.melodyDatabase = [];
+    // this.
+    console.debug("# Melody Database");
+    console.debug(this.getMelodiesIndex());
+    console.debug();
+
+    this.artistDatabase = [];
+    console.debug("# Artist Database");
+    console.debug(this.getArtistsIndex());
+    console.debug();
   }
 
   public static get Instance() {
@@ -54,7 +65,7 @@ export class DatabaseHandler {
     return result;
   }
 
-  public songIndex(id: string) {
+  public songCount(id: string) {
     let index = 0;
     let result = -1;
     this.songDatabase.forEach(entry => {
@@ -70,11 +81,19 @@ export class DatabaseHandler {
     return this.songDatabase;
   }
 
-  private getIndex(entry: Entry) {
+  private getId(entry: Entry) {
     return entry.id;
   }
 
   public getSongsIndex() {
-    return this.songDatabase.map(this.getIndex);
+    return this.songDatabase.map(this.getId);
+  }
+
+  public getArtistsIndex() {
+    return this.artistDatabase.map(this.getId);
+  }
+
+  public getMelodiesIndex() {
+    return this.melodyDatabase.map(this.getId);
   }
 }

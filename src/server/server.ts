@@ -16,6 +16,7 @@ export class Server {
 
   start() {
     this.express.listen(serverConstants.port);
+    console.log("# Server startup");
     console.log(
       `Running on http://${serverConstants.host}:${serverConstants.port}`
     );

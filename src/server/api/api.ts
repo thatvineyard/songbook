@@ -18,8 +18,10 @@ export function createApi(): Router {
   apiBuilder.subApi(melodiesUrl, melodiesApiBuilder);
   apiBuilder.subApi(artistsUrl, artistsApiBuilder);
 
+  // Set settings
   apiBuilder.enableApiInfo(apiInfoUrl);
   apiBuilder.activateValidation();
 
+  // Build and return router
   return apiBuilder.buildRouter(apiBuilder);
 }

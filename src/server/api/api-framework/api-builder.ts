@@ -242,46 +242,10 @@ export class ApiBuilder {
     }
   }
 
-  private validateParameters(
-    req: Request,
-    res: Response,
-    methods: Method[]
-  ): Response {
-    let url = req.url;
-    let httpMethod = req.method;
-
-    let missingParams: Parameter[] = [];
-    this.methods.forEach(method => {
-      if (method.url === url && method.httpMethod === httpMethod) {
-        method.parameters.forEach(parameter => {
-          if (!parameter.validateRequest(req)) {
-            missingParams.push(parameter);
-          }
-        });
-      }
-    });
-
-    if (missingParams.length != 0) {
-      res.status(Status.UNPROCESSABLE_ENTITY).write(
-        JSON.stringify({
-          missing: missingParams.map(param => {
-            return param.toString();
-          })
-        })
-      );
-    }
-
-    return res;
-  }
-
-  private validate(req: Request, res: Response, methods: Method[]): Response {
-    res = this.validateParameters(req, res, methods);
-
-    return res;
-  }
-
   private configureRouter(router: Router): void {
+    console.debug("# API Configuration:");
     console.debug(this.methods.join("\n"));
+    console.debug();
     // console.dir(this.methods, { depth: null });
     this.methods.forEach(method => {
       this.addMethodToRouter(router, method);
