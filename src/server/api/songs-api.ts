@@ -9,7 +9,7 @@ export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
 
 // common params
 let paramTitle = new Parameter(ParameterType.BODY, "title", "string", true);
-let paramId = new Parameter(ParameterType.BODY, "id", "string", true);
+let paramId = new Parameter(ParameterType.QUERY, "id", "string", true);
 
 /**
  * PUT SONGS
@@ -17,10 +17,8 @@ let paramId = new Parameter(ParameterType.BODY, "id", "string", true);
 
 // Function
 function putSong(req: Request, res: Response): void {
-  if (!req.body.id) {
-    res.status(Status.UNPROCESSABLE_ENTITY).send("Missing mandatory field: id");
-  } else {
-    let id = req.body.id;
+  if (req.query.id) {
+    let id = req.query.id;
 
     let db = DatabaseHandler.Instance;
     res.send(db.getSongs());

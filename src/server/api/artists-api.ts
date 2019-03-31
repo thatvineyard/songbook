@@ -66,12 +66,39 @@ let postArtistParams: Parameter[] = [
 artistsApiBuilder.addPost("", postArtist, "Post artist", postArtistParams);
 
 /**
+ * PUT ARTIST
+ */
+// Function
+function putArtist(req: Request, res: Response): void {
+  if (req.body.firstName && req.body.lastName) {
+    let firstName = req.body.firstName;
+    let lastName = req.body.lastName;
+
+    let db = DatabaseHandler.Instance;
+    let id = db.postArtist(firstName, lastName);
+
+    res.status(Status.CREATED).send(id);
+  }
+}
+
+// Params
+let putArtistParams: Parameter[] = [
+  new Parameter(ParameterType.BODY, "firstName", "string", true),
+  new Parameter(ParameterType.BODY, "lastName", "string", true)
+];
+
+// API
+artistsApiBuilder.addPut("", putArtist, "Post artist", putArtistParams);
+
+/**
  * GET ARTISTS INDEX
  */
 
 // Function
 function getArtistsIndex(req: Request, res: Response): void {
-  res.send(["001", "002", "003"]);
+  db = DatabaseHandler.Instance;
+
+  res.send(db.getArtistsIndex);
 }
 
 // API
