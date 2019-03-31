@@ -9,7 +9,8 @@ export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
 
 // common params
 let paramTitle = new Parameter(ParameterType.BODY, "title", "string", true);
-let paramId = new Parameter(ParameterType.QUERY, "id", "string", true);
+let paramIdRequired = new Parameter(ParameterType.QUERY, "id", "string", true);
+let paramIdOptional = new Parameter(ParameterType.QUERY, "id", "string", false);
 
 /**
  * PUT SONGS
@@ -26,7 +27,7 @@ function putSong(req: Request, res: Response): void {
 }
 
 // Params
-let putSongParams: Parameter[] = [paramId, paramTitle];
+let putSongParams: Parameter[] = [paramIdRequired, paramTitle];
 
 // API
 songsApiBuilder.addPut("", putSong, "Put song", putSongParams);
@@ -63,10 +64,10 @@ songsApiBuilder.addPost("", postSong, "Post song", postSongParams);
 
 // Function
 function deleteSong(req: Request, res: Response): void {
-  if (!req.body.id) {
+  if (!req.query.id) {
     res.status(Status.UNPROCESSABLE_ENTITY).send("Missing mandatory field: id");
   } else {
-    let id = req.body.id;
+    let id = req.query.id;
 
     let db = DatabaseHandler.Instance;
     let success = db.deleteSong(id);
@@ -80,27 +81,38 @@ function deleteSong(req: Request, res: Response): void {
 }
 
 // Params
-let deleteSongParams: Parameter[] = [paramId];
+let deleteSongParams: Parameter[] = [paramIdRequired];
 
 // API
 songsApiBuilder.addDelete("", deleteSong, "Delete song", deleteSongParams);
 
 /**
- * GET SONGS COLLECTION
+ * GET SONGS
  */
 
 // Function
-function getSongsCollection(req: Request, res: Response): void {
+function getSongs(req: Request, res: Response): void {
   let db = DatabaseHandler.Instance;
-  res.send(db.getSongs());
+
+  if (req.query.id) {
+    let id = req.query.id;
+    let result = db.getSong(id);
+
+    if (result !== null) {
+      res.send(result);
+    } else {
+      res.status(Status.NOT_FOUND).send();
+    }
+  } else {
+    res.send(db.getSongs());
+  }
 }
 
+// PARAMS
+let getSongsParams: Parameter[] = [paramIdOptional];
+
 // API
-songsApiBuilder.addGet(
-  serverConstants.collectionUrl,
-  getSongsCollection,
-  "Get song collection"
-);
+songsApiBuilder.addGet("", getSongs, "Get songs", getSongsParams);
 
 /**
  * GET SONGS INDEX

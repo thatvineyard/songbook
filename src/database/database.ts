@@ -1,6 +1,7 @@
 import { Song } from "../models/song";
 import { Entry } from "./entry";
 import { Artist } from "../models/artist";
+import { Melody } from "../models/melody";
 
 export class DatabaseHandler {
   private static _instance: DatabaseHandler;
@@ -46,6 +47,10 @@ export class DatabaseHandler {
     return this.songDatabase.has(id);
   }
 
+  public getSong(id: string): Entry | null {
+    return this.songDatabase.getEntry(id);
+  }
+
   public getSongs() {
     return this.songDatabase.getCollection();
   }
@@ -60,14 +65,44 @@ export class DatabaseHandler {
     return this.artistDatabase.post(artist);
   }
 
+  public deleteArtist(id: string) {
+    return this.artistDatabase.delete(id);
+  }
+
+  public hasArtist(id: string): boolean {
+    return this.artistDatabase.has(id);
+  }
+
+  public getArtist(id: string): Entry | null {
+    return this.artistDatabase.getEntry(id);
+  }
+
   public getArtists() {
     return this.artistDatabase.getCollection();
   }
+
   public getArtistsIndex() {
     return this.artistDatabase.getIndex();
   }
 
   // MELODY
+  public postMelody(title: string) {
+    let melody = new Melody(title);
+    return this.melodyDatabase.post(melody);
+  }
+
+  public deleteMelody(id: string) {
+    return this.melodyDatabase.delete(id);
+  }
+
+  public hasMelody(id: string): boolean {
+    return this.melodyDatabase.has(id);
+  }
+
+  public getMelody(id: string): Entry | null {
+    return this.melodyDatabase.getEntry(id);
+  }
+
   public getMelodies() {
     return this.melodyDatabase.getCollection();
   }
@@ -88,6 +123,18 @@ class Database {
     let entry = new Entry(data);
     this.entryList.push(new Entry(data));
     return entry;
+  }
+
+  public getEntry(id: string): Entry | null {
+    let result: Entry | null = null;
+
+    this.entryList.forEach(entry => {
+      if (entry.id === id) {
+        result = entry;
+      }
+    });
+
+    return result;
   }
 
   public getCollection() {

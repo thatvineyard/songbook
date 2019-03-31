@@ -96,7 +96,7 @@ artistsApiBuilder.addPut("", putArtist, "Post artist", putArtistParams);
 
 // Function
 function getArtistsIndex(req: Request, res: Response): void {
-  db = DatabaseHandler.Instance;
+  let db = DatabaseHandler.Instance;
 
   res.send(db.getArtistsIndex);
 }

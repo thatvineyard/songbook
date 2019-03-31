@@ -1,7 +1,7 @@
 import { ApiBuilder } from "./api-builder";
 import { Router, NextFunction, Response, Request } from "express";
 import { Method } from "./method";
-import { Parameter } from "./parameter";
+import { Parameter, ParameterType } from "./parameter";
 import * as Status from "http-status-codes";
 
 // Add method validator middleware
@@ -37,7 +37,6 @@ function validateParameters(
 
   // Find missing parameters
   methods.forEach(method => {
-    console.log(method.url + " : " + url);
     if (method.url === url && method.httpMethod === httpMethod) {
       method.parameters.forEach(parameter => {
         if (!validateRequestParameters(req, parameter)) {
@@ -71,13 +70,11 @@ function validateRequestParameters(
   let result = true;
 
   if (parameter.required) {
-    if (!req[parameter.parameterType.toString()][parameter.name]) {
-      result = false;
-    }
+    result = requestHasParameter(req, parameter.parameterType, parameter.name);
   } else {
-    if (req[parameter.parameterType.toString()][parameter.name]) {
+    if (requestHasParameter(req, parameter.parameterType, parameter.name)) {
       parameter.dependencies.forEach(dependency => {
-        if (validateRequestForceRequired(req, dependency)) {
+        if (validateRequestParameterForceRequired(req, dependency)) {
           result = false;
         }
       });
@@ -86,9 +83,26 @@ function validateRequestParameters(
   return result;
 }
 
+function requestHasParameter(
+  req: Request,
+  parameterType: ParameterType,
+  parameterName: string
+): boolean {
+  if (parameterType === ParameterType.BODY) {
+    if (!req.body[parameterName]) {
+      return false;
+    }
+  } else if (parameterType === ParameterType.QUERY) {
+    if (!req.query[parameterName]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function validateRequestParameterForceRequired(
   req: Request,
   parameter: Parameter
 ): boolean {
-  return !(req[parameter.parameterType.toString()][parameter.name] === null);
+  return requestHasParameter(req, parameter.parameterType, parameter.name);
 }
