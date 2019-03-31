@@ -1,9 +1,10 @@
 import express, { Request, Response } from "express";
 import serverConstants from "../../constants/serverConstants";
 import { DatabaseHandler } from "../../database/database";
-import { ApiBuilder, Parameter, ParameterType } from "./apiBuilder";
+import { ApiBuilder } from "./apiBuilder";
 import { request } from "http";
 import * as Status from "http-status-codes";
+import { Parameter, ParameterType } from "./parameter";
 
 export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
 
