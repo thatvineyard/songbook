@@ -14,7 +14,12 @@
 
 **Api Info**
 
-Get up to date api information in relation to subpath by calling `GET:{subpath}/api-info`.
+Get up to date api information in relation to subpath by calling `GET:{base url}/api-info`.
+
+Parameters:
+ - **url** - Filter by url
+ - **httpMethod** - Filter by http method (GET, POST, PUT etc...)
+ - **options** - Options
 
 The api information shows:
  - possible paths
@@ -24,15 +29,23 @@ The api information shows:
 >
 > Request:
 >
-> `GET: {baseUrl}/songs/api-info`
+> `GET: {base url}/api-info`
+> ```
+> Headers:
+> Content-Type: application/json
+>
+> Body: 
+> 
+> {
+>   "url": "/api/v1/songs",
+>   "httpMethod": "GET",
+>   "options": ["brief"]
+> }
+> ```
 >
 > Result:
 > ```
-> [
->     "/collection",
->     "/index",
->     "/action"
-> ]
+> TODO
 > ```
 
 **Routes**
