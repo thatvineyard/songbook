@@ -1,13 +1,9 @@
-import express, {
-  Request,
-  Response,
-  Router,
-  RequestHandler,
-  NextFunction
-} from "express";
-import { Parameter, ParameterType } from "./parameter";
+import express, { Request, RequestHandler, Response, Router } from "express";
 import * as Status from "http-status-codes";
-import { RSA_NO_PADDING } from "constants";
+import { registerApiInfo } from "./api-info";
+import { registerApiValidator } from "./api-validator";
+import { HttpMethod, Method } from "./method";
+import { Parameter } from "./parameter";
 
 export class ApiBuilder {
   contextRoot: string;
@@ -214,119 +210,14 @@ export class ApiBuilder {
     });
   }
 
-  public buildRouter(): Router {
-    let router = express.Router();
+  public buildRouter(apiBuilder: ApiBuilder): Router {
+    registerApiInfo(apiBuilder);
 
-    this.configureRouter(router);
+    let router: Router = express.Router();
 
+    registerApiValidator(apiBuilder, router);
+
+    apiBuilder.configureRouter(router);
     return router;
   }
-}
-
-export enum HttpMethod {
-  GET = "GET",
-  HEAD = "HEAD",
-  POST = "POST",
-  PUT = "PUT",
-  DELETE = "DELETE",
-  CONNECT = "CONNECT",
-  OPTIONS = "OPTIONS",
-  TRACE = "TRACE",
-  PATCH = "PATCH"
-}
-
-class Method {
-  httpMethod: HttpMethod;
-  url: string;
-  description: string;
-  parameters: Parameter[];
-  handlers: RequestHandler;
-  permission: string;
-
-  constructor(
-    method: HttpMethod,
-    url: string,
-    handlers: RequestHandler,
-    description?: string,
-    parameters?: Parameter[],
-    permission?: string
-  ) {
-    this.httpMethod = method;
-    this.url = url;
-    this.description = description || "";
-    this.parameters = parameters || [];
-    this.handlers = handlers;
-    this.permission = permission || "public";
-  }
-
-  public toString() {
-    return this.httpMethod + ": " + this.url;
-  }
-}
-
-export let getApiParams: Parameter[] = [
-  new Parameter(ParameterType.BODY, "url", "string"),
-  new Parameter(ParameterType.BODY, "httpMethod", "enum (BODY, GET)"),
-  new Parameter(ParameterType.BODY, "permission", "string"),
-  new Parameter(
-    ParameterType.BODY,
-    "options",
-    "list of enum (brief, noParameters)"
-  )
-];
-
-export function getApiInfo(req: Request, res: Response, methods: Method[]) {
-  let result: Method[] = methods.slice(0);
-
-  // Filter URLs
-  if (req.body.url) {
-    let url = req.body.url;
-    result = result.filter(function(method: Method) {
-      // TODO: Rewrite this with split on urls so that it forces a match on each subpath
-      // eg: /ap should not match with /api
-      return method.url.startsWith(url);
-    });
-  }
-
-  // Filter http methods
-  if (req.body.httpMethod) {
-    let httpMethod = req.body.httpMethod;
-    result = result.filter(function(method: Method) {
-      return method.httpMethod === httpMethod;
-    });
-  }
-
-  // Filter permission
-  if (req.body.permission) {
-    let permission = req.body.permission;
-    result = result.filter(function(method: Method) {
-      return method.permission === permission;
-    });
-  }
-
-  // Options
-  if (req.body.options && Array.isArray(req.body.options)) {
-    let options: string = req.body.options;
-
-    options.forEach((option: string) => {
-      switch (option) {
-        case "brief":
-          result = result.map((method: Method) => {
-            return method.toString();
-          });
-          break;
-        case "noParameters":
-          result = result.map((method: Method) => {
-            if (method.parameters) {
-              method.parameters = [];
-              return method;
-            }
-          });
-
-          break;
-      }
-    });
-  }
-
-  res.send(result);
 }

@@ -1,7 +1,7 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import serverConstants from "../../constants/serverConstants";
-import { ApiBuilder } from "./apiBuilder";
-import { Parameter, ParameterType } from "./parameter";
+import { ApiBuilder } from "./api-framework/api-builder";
+import { Parameter, ParameterType } from "./api-framework/parameter";
 
 export let artistsApiBuilder: ApiBuilder = new ApiBuilder("");
 
