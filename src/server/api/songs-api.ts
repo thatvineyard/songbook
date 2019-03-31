@@ -105,7 +105,7 @@ function getSongs(req: Request, res: Response): void {
     if (result !== null) {
       res.send(result);
     } else {
-      res.status(Status.NOT_FOUND).send();
+      create404("No song found at id " + id).sendResponse(res);
     }
   } else {
     res.send(db.getSongs());
