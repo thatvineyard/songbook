@@ -2,6 +2,7 @@ import { Song } from "../models/song";
 import { Entry } from "./entry";
 import { Artist } from "../models/artist";
 import { Melody } from "../models/melody";
+import colors from 'colors';
 
 export class DatabaseHandler {
   private static _instance: DatabaseHandler;
@@ -13,18 +14,18 @@ export class DatabaseHandler {
   private constructor() {
     this.songDatabase = new Database();
     this.postSong("Old song");
-    console.debug("# Song Database");
+    console.debug(colors.cyan("# Song Database"));
     console.debug(this.getSongsIndex());
     console.debug();
 
     this.melodyDatabase = new Database();
-    console.debug("# Melody Database");
+    console.debug(colors.cyan("# Melody Database"));
     console.debug(this.getMelodiesIndex());
     console.debug();
 
     this.artistDatabase = new Database();
     this.postArtist("Carl", "Wangman");
-    console.debug("# Artist Database");
+    console.debug(colors.cyan("# Artist Database"));
     console.debug(this.getArtistsIndex());
     console.debug();
   }

@@ -4,6 +4,7 @@ import { registerApiInfo } from "./api-info";
 import { registerApiValidator } from "./api-validator";
 import { HttpMethod, Method } from "./method";
 import { Parameter } from "./parameter";
+import colors from 'colors';
 
 export class ApiBuilder {
   contextRoot: string;
@@ -243,8 +244,8 @@ export class ApiBuilder {
   }
 
   private configureRouter(router: Router): void {
-    console.debug("# API Configuration:");
-    console.debug(this.methods.join("\n"));
+    console.debug(colors.cyan("# API Configuration:"));
+    console.debug(this.methods.join("\n").split(' ').join('\t'));
     console.debug();
     // console.dir(this.methods, { depth: null });
     this.methods.forEach(method => {

@@ -1,6 +1,6 @@
 import express, { Express } from "express";
 import { createApi } from "./api/api";
-
+import colors from 'colors';
 import serverConstants from "../constants/serverConstants";
 import bodyParser = require("body-parser");
 
@@ -16,7 +16,7 @@ export class Server {
 
   start() {
     this.express.listen(serverConstants.port);
-    console.log("# Server startup");
+    console.log(colors.cyan("# Server startup"));
     console.log(
       `Running on http://${serverConstants.host}:${serverConstants.port}`
     );
