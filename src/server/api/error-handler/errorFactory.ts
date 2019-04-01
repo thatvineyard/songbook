@@ -1,10 +1,11 @@
 import serverConstants from "../../../constants/serverConstants";
 import * as Status from "http-status-codes";
-import { ErrorResponse } from "./error-response";
+import { ErrorResponse, ErrorType } from "./error-response";
 
 export function create404(details?: string): ErrorResponse {
   return new ErrorResponse(
     serverConstants.serviceName,
+    ErrorType.INTERNAL,
     Status.NOT_FOUND.valueOf(),
     "NotFound",
     details || "Content not found"
@@ -14,6 +15,7 @@ export function create404(details?: string): ErrorResponse {
 export function create422(details?: string): ErrorResponse {
   return new ErrorResponse(
     serverConstants.serviceName,
+    ErrorType.INTERNAL,
     Status.UNPROCESSABLE_ENTITY.valueOf(),
     "UnprocessableEntity",
     details || "A field in the request was unprocessable"

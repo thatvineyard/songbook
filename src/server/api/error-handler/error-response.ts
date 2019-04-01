@@ -2,6 +2,7 @@ import { Response } from "express";
 
 export class ErrorResponse {
   service: string;
+  errorType: ErrorType;
   httpStatus: number;
   errorCode: string;
   details: string;
@@ -9,12 +10,14 @@ export class ErrorResponse {
 
   constructor(
     service: string,
+    errorType: ErrorType,
     httpStatus: number,
     errorCode: string,
     details: string,
     cause?: ErrorResponse
   ) {
     this.service = service;
+    this.errorType = errorType;
     this.httpStatus = httpStatus;
     this.errorCode = errorCode;
     this.details = details;
@@ -26,6 +29,13 @@ export class ErrorResponse {
       .status(this.httpStatus)
       .contentType("application/json")
       .send(this);
+  }
+
+  public writeResponse(res: Response) {
+    res
+      .status(this.httpStatus)
+      .contentType("application/json")
+      .write(JSON.stringify(this));
   }
 
   public getRootCause(): ErrorResponse {
@@ -55,4 +65,10 @@ export class ErrorResponse {
       toString() + "\n" + (this.cause !== undefined ? this.cause.toLog() : "")
     );
   }
+}
+
+export enum ErrorType {
+  INTERNAL = "INTERNAL",
+  CONNECTION = "CONNECTION",
+  EXTERNAL = "EXTERNAL"
 }

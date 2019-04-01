@@ -3,6 +3,7 @@ import { Router, NextFunction, Response, Request } from "express";
 import { Method } from "./method";
 import { Parameter, ParameterType } from "./parameter";
 import * as Status from "http-status-codes";
+import { create422 } from "../error-handler/errorFactory";
 
 // Add method validator middleware
 export function registerApiValidator(
@@ -48,16 +49,10 @@ function validateParameters(
 
   // Formulate response
   if (missingParams.length != 0) {
-    res
-      .status(Status.UNPROCESSABLE_ENTITY)
-      .contentType("application/json")
-      .write(
-        JSON.stringify({
-          missingParameters: missingParams.map(param => {
-            return param.toString();
-          })
-        })
-      );
+    create422("missing parameters: " + missingParams.map(param => {
+          return param.toString();
+        }).join(", ")
+    ).writeResponse(res);
   }
 
   return res;
