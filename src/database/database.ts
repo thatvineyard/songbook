@@ -3,6 +3,7 @@ import { Entry } from "./entry";
 import { Artist } from "../models/artist";
 import { Melody } from "../models/melody";
 import colors from 'colors';
+import { IdGenerator } from "./id";
 
 export class DatabaseHandler {
   private static _instance: DatabaseHandler;
@@ -12,18 +13,18 @@ export class DatabaseHandler {
   private artistDatabase: Database;
 
   private constructor() {
-    this.songDatabase = new Database();
-    this.postSong("Old song");
+    this.songDatabase = new Database("song");
+    this.postSong("Old song", "Oldman", "Oldies");
     console.debug(colors.cyan("# Song Database"));
     console.debug(this.getSongsIndex());
     console.debug();
 
-    this.melodyDatabase = new Database();
+    this.melodyDatabase = new Database("melody");
     console.debug(colors.cyan("# Melody Database"));
     console.debug(this.getMelodiesIndex());
     console.debug();
 
-    this.artistDatabase = new Database();
+    this.artistDatabase = new Database("aritst");
     this.postArtist("Carl", "Wangman");
     console.debug(colors.cyan("# Artist Database"));
     console.debug(this.getArtistsIndex());
@@ -35,12 +36,39 @@ export class DatabaseHandler {
   }
 
   // SONG
-  public postSong(title: string): string {
-    let song = new Song(title);
+  public postSong(title: string, artist: string, melody: string): string {
+    let song = new Song(title, artist, melody);
     return this.songDatabase.post(song);
   }
 
+  public putSong(id: string, title: string, artist: string, melody: string): Entry | null {
+    let song = new Song(title, artist, melody);
+    this.songDatabase.save(id);
+    return this.songDatabase.put(id, song);
+  }
+  
+  public patchSong(id: string, title?: string, artist?: string, melody?: string): Entry | null {
+    let entry = this.songDatabase.get(id);
+    if (entry) {
+      let song: Song = entry.entryData as Song;
+      this.songDatabase.save(id);
+      if(title) {
+        song.title = title;
+      }
+      if(artist) {
+        song.artist = artist;
+      }
+      if(melody) {
+        song.melody = melody;
+      }
+      return this.songDatabase.put(id, song);
+    } else {
+      return null;
+    }
+  }
+
   public deleteSong(id: string) {
+    this.songDatabase.save(id);
     return this.songDatabase.delete(id);
   }
 
@@ -49,7 +77,7 @@ export class DatabaseHandler {
   }
 
   public getSong(id: string): Entry | null {
-    return this.songDatabase.getEntry(id);
+    return this.songDatabase.get(id);
   }
 
   public getSongs() {
@@ -75,7 +103,7 @@ export class DatabaseHandler {
   }
 
   public getArtist(id: string): Entry | null {
-    return this.artistDatabase.getEntry(id);
+    return this.artistDatabase.get(id);
   }
 
   public getArtists() {
@@ -101,7 +129,7 @@ export class DatabaseHandler {
   }
 
   public getMelody(id: string): Entry | null {
-    return this.melodyDatabase.getEntry(id);
+    return this.melodyDatabase.get(id);
   }
 
   public getMelodies() {
@@ -114,23 +142,43 @@ export class DatabaseHandler {
 }
 
 class Database {
-  entryList: Entry[];
+  name: string;
+  entries: Entry[];
+  removedEntries: Entry[];
+  idGenerator: IdGenerator;
 
-  constructor() {
-    this.entryList = [];
+  constructor(name: string) {
+    this.name = name;
+    this.entries = [];
+    this.removedEntries = [];
+    this.idGenerator = new IdGenerator(name);
   }
 
   public create(data: object): Entry {
-    let entry = new Entry(data);
-    this.entryList.push(new Entry(data));
+    let entry = new Entry(data, this.idGenerator);
+    this.entries.push(entry);
     return entry;
   }
 
-  public getEntry(id: string): Entry | null {
+  public save(id: string): void {
+    let oldEntry = {...this.get(id)} as Entry;
+    this.removedEntries.push(oldEntry);
+    console.dir({removedEntries: this.removedEntries}, {depth: null});
+  }
+
+  public update(id: string, data: object): Entry | null {
+    let entry = this.get(id)
+    if (entry) {
+      entry.update(data);
+    }
+    return entry;
+  }
+
+  public get(id: string): Entry | null {
     let result: Entry | null = null;
 
-    this.entryList.forEach(entry => {
-      if (entry.id === id) {
+    this.entries.forEach(entry => {
+      if (entry.idEquals(id)) {
         result = entry;
       }
     });
@@ -139,22 +187,30 @@ class Database {
   }
 
   public getCollection() {
-    return this.entryList;
+    return this.entries;
   }
 
   public getIndex() {
-    return this.entryList.map((entry: Entry) => {
-      return entry.id;
+    return this.entries.map((entry: Entry) => {
+      return entry.getId();
     });
   }
 
   public post(data: object): string {
-    return this.create(data).id;
+    return this.create(data).getId();
+  }
+
+  public put(id: string, data: object): Entry | null {
+    if (this.has(id)) {
+      return this.update(id, data);
+    } else {
+      return null;
+    }
   }
 
   public delete(id: string) {
     if (this.has(id)) {
-      this.entryList = this.entryList.filter(entry => {
+      this.entries = this.entries.filter(entry => {
         return !entry.idEquals(id);
       });
       return true;
@@ -165,7 +221,7 @@ class Database {
 
   public has(id: string) {
     let result = false;
-    this.entryList.forEach(entry => {
+    this.entries.forEach(entry => {
       if (entry.idEquals(id)) {
         result = true;
       }

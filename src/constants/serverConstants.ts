@@ -6,7 +6,8 @@ const constants = {
   apiInfoUrl: "/api-info",
   collectionUrl: "/collection",
   indexUrl: "/index",
-  actionUrl: "/action"
+  actionUrl: "/action",
+  idGeneration: "incremental"
 };
 
 export default constants;

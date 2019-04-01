@@ -16,10 +16,10 @@ export enum HttpMethod {
 export class Method {
   httpMethod: HttpMethod;
   url: string;
+  permission: string;
   description: string;
   parameters: Parameter[];
   handlers: RequestHandler;
-  permission: string;
 
   constructor(
     method: HttpMethod,
@@ -31,10 +31,10 @@ export class Method {
   ) {
     this.httpMethod = method;
     this.url = url;
+    this.permission = permission || "public";
     this.description = description || "";
     this.parameters = parameters || [];
     this.handlers = handlers;
-    this.permission = permission || "public";
   }
 
   public toString() {
