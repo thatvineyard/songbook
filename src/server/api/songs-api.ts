@@ -203,7 +203,7 @@ songsApiBuilder.addGet(
 );
 
 /**
- * HISTORY: GET SONG REVISION
+ * HISTORY: GET SONG REVISIONS
  */
 function getSongRevision(req: Request, res: Response): void {
   let db = DatabaseHandler.Instance;
@@ -218,7 +218,7 @@ function getSongRevision(req: Request, res: Response): void {
       create404("No song found at id " + id).sendResponse(res);
     }
   } else {
-    res.send(db.getSongs());
+    res.send(db.get());
   }
 }
 

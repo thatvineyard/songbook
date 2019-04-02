@@ -15,8 +15,10 @@ import colors from "colors";
  *  - delete: Remove an Entry from collection based on a unique identifier. The removed Entry is added to history. 
  * 
  *  - recover: Return an Entry from history based on a unique identifier and a revision number. 
- *  - purge: Remove an Entry from history based on a unique identifier and revision number. 
+ *  - drop: Remove an Entry from history based on a unique identifier and revision number. 
  *  - restore: Return an Entry from history based on a unique identifier and a revision number then replace the Entry in collection with the same unique identifier. The new Entry has a new revision number and lastModified timestamp. The replaced Entry is added to history.
+ *  
+ *  - purge: Remove an Entry from history based on a unique identifier and revision number. 
  */
 export class Database {
   name: string;
@@ -46,7 +48,7 @@ export class Database {
     }
   }
 
-  public purge(id: string, revision: number): void {
+  public drop(id: string, revision: number): void {
     this.history = this.history.filter((entry: Entry) => {
       if (entry.getId() === id) {
         if (entry.revision === earliestRevision) {
