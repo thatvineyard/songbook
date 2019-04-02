@@ -1,23 +1,39 @@
 import databaseConstants from "../constants/databaseConstants";
 import { Entry } from "./entry";
 import { IdGenerator } from "./id";
+import colors from "colors";
 
+/**
+ * 
+ * Glossary:
+ *  - 
+ *  
+ *  - get: Return an Entry from collection based on a unique identifier
+ *  - post: Create a new Entry from collection with a new unique identifier with a given object.
+ *  - put: Replace an Entry from collection based on a unique identifier with a given object. The new Entry has a new revision number and lastModified timestamp. The replaced Entry is added to history.
+ *  - patch: Replace an Entry from collection based on a unique identifier with a given field. The new Entry has a new revision number and lastModified timestamp. The replaced Entry is added to history.
+ *  - delete: Remove an Entry from collection based on a unique identifier. The removed Entry is added to history. 
+ * 
+ *  - recover: Return an Entry from history based on a unique identifier and a revision number. 
+ *  - purge: Remove an Entry from history based on a unique identifier and revision number. 
+ *  - restore: Return an Entry from history based on a unique identifier and a revision number then replace the Entry in collection with the same unique identifier. The new Entry has a new revision number and lastModified timestamp. The replaced Entry is added to history.
+ */
 export class Database {
   name: string;
-  entries: Entry[];
+  collection: Entry[];
   history: Entry[];
   idGenerator: IdGenerator;
 
   constructor(name: string) {
     this.name = name;
-    this.entries = [];
+    this.collection = [];
     this.history = [];
     this.idGenerator = new IdGenerator(name);
   }
 
   public create(data: object): Entry {
     let entry = new Entry(data, this.idGenerator);
-    this.entries.push(entry);
+    this.collection.push(entry);
     return entry;
   }
 
@@ -27,15 +43,33 @@ export class Database {
     );
     if (entryRevisions.length > databaseConstants.maxRevisionHistory) {
       let earliestRevision = this.getEarliestRevisionNumber(entryRevisions);
-      this.history = this.history.filter((entry: Entry) => {
-        if (entry.getId() === id) {
-          if (entry.revision === earliestRevision) {
-            return false;
-          }
-        }
-        return true;
-      });
     }
+  }
+
+  public purge(id: string, revision: number): void {
+    this.history = this.history.filter((entry: Entry) => {
+      if (entry.getId() === id) {
+        if (entry.revision === earliestRevision) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  public recover(id: string, revision: number): Entry | null {
+    this.history = this.history.filter((entry: Entry) => {
+      if (entry.getId() === id) {
+        if (entry.revision === earliestRevision) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  public restore(id: string, revision: number): Entry | null {
+    this.put(this.recover(id, revision));
   }
 
   private getEarliestRevisionNumber(entryRevisions: Entry[]) {
@@ -69,7 +103,7 @@ export class Database {
   public get(id: string): Entry | null {
     let result: Entry | null = null;
 
-    this.entries.forEach(entry => {
+    this.collection.forEach(entry => {
       if (entry.idEquals(id)) {
         result = entry;
       }
@@ -79,19 +113,19 @@ export class Database {
   }
 
   public size(): number {
-    return this.entries.length;
+    return this.collection.length;
   }
 
-  private historySize(): number {
-    return this.entries.length;
+  public historySize(): number {
+    return this.history.length;
   }
 
   public getCollection() {
-    return this.entries;
+    return this.collection;
   }
 
   public getIndex() {
-    return this.entries.map((entry: Entry) => {
+    return this.collection.map((entry: Entry) => {
       return entry.getId();
     });
   }
@@ -110,7 +144,7 @@ export class Database {
 
   public delete(id: string) {
     if (this.has(id)) {
-      this.entries = this.entries.filter(entry => {
+      this.collection = this.collection.filter(entry => {
         return !entry.idEquals(id);
       });
       return true;
@@ -121,11 +155,47 @@ export class Database {
 
   public has(id: string) {
     let result = false;
-    this.entries.forEach(entry => {
+    this.collection.forEach(entry => {
       if (entry.idEquals(id)) {
         result = true;
       }
     });
     return result;
+  }
+
+  public getStats() {
+    return {
+      collectionSize: this.size(),
+      historySize: this.historySize()
+    };
+  }
+
+  public logBrief() {
+    console.info(colors.cyan("# " + this.name + " Database"));
+    console.table(this.getStats());
+    if (this.size() != 0) {
+      console.table(this.getIndex());
+    } else {
+      console.info("Collection is empty");
+    }
+  }
+
+  public logVerbose() {
+    console.info(colors.cyan("# " + this.name + " Database"));
+    console.groupCollapsed("Collection");
+    console.table(this.getStats());
+    if (this.collection.length != 0) {
+      console.table(this.collection);
+    } else {
+      console.info("Collection is empty");
+    }
+    console.groupEnd("Collection");
+    console.group("History");
+    if (this.history.length != 0) {
+      console.table(this.history);
+    } else {
+      console.info("History is empty");
+    }
+    console.groupEnd("History");
   }
 }

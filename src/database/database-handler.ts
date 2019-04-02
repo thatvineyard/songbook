@@ -15,19 +15,16 @@ export class DatabaseHandler {
     private constructor() {
         this.songDatabase = new Database("song");
         this.postSong("Old song", "Oldman", "Oldies");
-        console.debug(colors.cyan("# Song Database"));
-        console.debug(this.getSongsIndex());
+        this.songDatabase.logBrief();
         console.debug();
 
         this.melodyDatabase = new Database("melody");
-        console.debug(colors.cyan("# Melody Database"));
-        console.debug(this.getMelodiesIndex());
+        this.melodyDatabase.logBrief();
         console.debug();
 
         this.artistDatabase = new Database("aritst");
         this.postArtist("Carl", "Wangman");
-        console.debug(colors.cyan("# Artist Database"));
-        console.debug(this.getArtistsIndex());
+        this.artistDatabase.logBrief();
         console.debug();
     }
 

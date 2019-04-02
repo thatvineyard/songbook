@@ -5,6 +5,7 @@ const constants = {
   contextRoot: "/api/v1",
   apiInfoUrl: "/api-info",
   collectionUrl: "/collection",
+  historyUrl: "/history",
   indexUrl: "/index",
   actionUrl: "/action",
   idGeneration: "incremental"

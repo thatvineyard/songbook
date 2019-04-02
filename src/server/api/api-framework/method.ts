@@ -38,6 +38,6 @@ export class Method {
   }
 
   public toString() {
-    return this.httpMethod + ": " + this.url;
+    return this.httpMethod + ": " + this.url + " - " + this.description;
   }
 }

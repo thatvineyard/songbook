@@ -11,15 +11,22 @@ import { Song } from "models/song";
 export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
 
 // common params
-let paramTitleRequired = new Parameter(ParameterType.BODY, "title", "string", true);
-let paramTitleOptional = new Parameter(ParameterType.BODY, "title", "string", false);
-let paramArtistRequired = new Parameter(ParameterType.BODY, "artist", "string", true);
-let paramArtistOptional = new Parameter(ParameterType.BODY, "artist", "string", false);
-let paramMelodyRequired = new Parameter(ParameterType.BODY, "melody", "string", true);
-let parammelodyOptional = new Parameter(ParameterType.BODY, "melody", "string", false);
-let paramIdRequired = new Parameter(ParameterType.QUERY, "id", "string", true);
-let paramIdOptional = new Parameter(ParameterType.QUERY, "id", "string", false);
-let paramRefsList = new Parameter(ParameterType.BODY, "refs", "list of strings", false);
+let paramBodyTitleRequired = new Parameter(ParameterType.BODY, "title", "string", true);
+let paramBodyTitleOptional = new Parameter(ParameterType.BODY, "title", "string", false);
+
+let paramBodyArtistRequired = new Parameter(ParameterType.BODY, "artist", "string", true);
+let paramBodyArtistOptional = new Parameter(ParameterType.BODY, "artist", "string", false);
+
+let paramBodyMelodyRequired = new Parameter(ParameterType.BODY, "melody", "string", true);
+let paramBodyMelodyOptional = new Parameter(ParameterType.BODY, "melody", "string", false);
+
+let paramQueryIdRequired = new Parameter(ParameterType.QUERY, "id", "string", true);
+let paramQueryIdOptional = new Parameter(ParameterType.QUERY, "id", "string", false);
+let paramBodyIdRequired = new Parameter(ParameterType.BODY, "id", "string", true);
+let paramBodyIdOptional = new Parameter(ParameterType.BODY, "id", "string", false);
+
+let paramQueryRevisionRequired = new Parameter(ParameterType.QUERY, "revision", "integer", true);
+let paramBodyRefsList = new Parameter(ParameterType.BODY, "refs", "list of strings", false);
 
 /**
  * PUT SONGS
@@ -45,10 +52,10 @@ function putSong(req: Request, res: Response): void {
 }
 
 // Params
-let putSongParams: Parameter[] = [paramIdRequired, paramTitleRequired, paramArtistRequired, paramMelodyRequired];
+let putSongParams: Parameter[] = [paramQueryIdRequired, paramBodyTitleRequired, paramBodyArtistRequired, paramBodyMelodyRequired];
 
 // API
-songsApiBuilder.addPut("", putSong, "Put song", putSongParams);
+songsApiBuilder.addPut(serverConstants.collectionUrl, putSong, "Put song", putSongParams);
 
 /**
  * POST SONGS
@@ -73,10 +80,10 @@ function postSong(req: Request, res: Response): void {
 }
 
 // Params
-let postSongParams: Parameter[] = [paramTitleRequired, paramArtistRequired, paramMelodyRequired];
+let postSongParams: Parameter[] = [paramBodyTitleRequired, paramBodyArtistRequired, paramBodyMelodyRequired];
 
 // API
-songsApiBuilder.addPost("", postSong, "Post song", postSongParams);
+songsApiBuilder.addPost(serverConstants.collectionUrl, postSong, "Post song", postSongParams);
 
 /**
  * PATCH SONG
@@ -102,10 +109,10 @@ function patchSong(req: Request, res: Response): void {
 }
 
 // Params
-let patchSongParams: Parameter[] = [paramIdRequired, paramTitleOptional, paramArtistOptional, parammelodyOptional];
+let patchSongParams: Parameter[] = [paramQueryIdRequired, paramBodyTitleOptional, paramBodyArtistOptional, paramBodyMelodyOptional];
 
 // API
-songsApiBuilder.addPatch("", patchSong, "Patch song", patchSongParams);
+songsApiBuilder.addPatch(serverConstants.collectionUrl, patchSong, "Patch song", patchSongParams);
 
 
 /**
@@ -133,10 +140,10 @@ function deleteSong(req: Request, res: Response): void {
 }
 
 // Params
-let deleteSongParams: Parameter[] = [paramIdRequired];
+let deleteSongParams: Parameter[] = [paramQueryIdRequired];
 
 // API
-songsApiBuilder.addDelete("", deleteSong, "Delete song", deleteSongParams);
+songsApiBuilder.addDelete(serverConstants.collectionUrl, deleteSong, "Delete song", deleteSongParams);
 
 /**
  * GET SONGS
@@ -161,10 +168,10 @@ function getSongs(req: Request, res: Response): void {
 }
 
 // PARAMS
-let getSongsParams: Parameter[] = [paramIdOptional, paramRefsList];
+let getSongsParams: Parameter[] = [paramQueryIdOptional, paramBodyRefsList];
 
 // API
-songsApiBuilder.addGet("", getSongs, "Get songs", getSongsParams);
+songsApiBuilder.addGet(serverConstants.collectionUrl, getSongs, "Get songs", getSongsParams);
 
 /**
  * GET SONGS INDEX
@@ -194,3 +201,95 @@ songsApiBuilder.addGet(
   getSongsAction,
   "Temporary action"
 );
+
+/**
+ * HISTORY: GET SONG REVISION
+ */
+function getSongRevision(req: Request, res: Response): void {
+  let db = DatabaseHandler.Instance;
+
+  if (req.query.id) {
+    let id = req.query.id;
+    let result = db.getSong(id);
+
+    if (result !== null) {
+      res.send(result);
+    } else {
+      create404("No song found at id " + id).sendResponse(res);
+    }
+  } else {
+    res.send(db.getSongs());
+  }
+}
+
+// Params
+let getSongRevisionParams: Parameter[] = [paramQueryIdRequired, paramQueryRevisionRequired];
+
+// API
+songsApiBuilder.addGet(serverConstants.historyUrl, getSongRevision, "Get song revision", getSongRevisionParams);
+
+/**
+ * HISTORY: DROP SONG REVISION
+ */
+function dropSongRevision(req: Request, res: Response): void {
+  let db = DatabaseHandler.Instance;
+
+  if (req.query.id) {
+    let id = req.query.id;
+    let result = db.getSong(id);
+
+    if (result !== null) {
+      res.send(result);
+    } else {
+      create404("No song found at id " + id).sendResponse(res);
+    }
+  } else {
+    res.send(db.getSongs());
+  }
+}
+
+// Params
+let dropSongRevisionParams: Parameter[] = [paramQueryIdRequired, paramQueryRevisionRequired];
+
+// API
+songsApiBuilder.addDelete(serverConstants.historyUrl, dropSongRevision, "Drop song revision", dropSongRevisionParams);
+
+/**
+ * ACTION: PURGE SONG
+ */
+function purgeSong(req: Request, res: Response): void {
+  let db = DatabaseHandler.Instance;
+
+}
+
+// Params
+let purgeSongParams: Parameter[] = [paramBodyIdRequired];
+
+// API
+songsApiBuilder.addPost(serverConstants.actionUrl + "/purge", dropSongRevision, "Purge song revision", dropSongRevisionParams);
+
+/**
+ * ACTION: PURGE REVISION 
+ */
+function restoreSongRevision(req: Request, res: Response): void {
+  let db = DatabaseHandler.Instance;
+
+  if (req.query.id) {
+    let id = req.query.id;
+    let result = db.getSong(id);
+
+    if (result !== null) {
+      res.send(result);
+    } else {
+      create404("No song found at id " + id).sendResponse(res);
+    }
+  } else {
+    res.send(db.getSongs());
+  }
+}
+
+// Params
+let restoreSongParams: Parameter[] = [paramQueryIdRequired, paramQueryRevisionRequired];
+
+// API
+songsApiBuilder.addPost(serverConstants.actionUrl + "/restore", restoreSongRevision, "Restore song revision", restoreSongParams);
