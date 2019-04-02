@@ -21,3 +21,13 @@ export function create422(details?: string): ErrorResponse {
     details || "A field in the request was unprocessable"
   );
 }
+
+export function create500(details?: string): ErrorResponse {
+  return new ErrorResponse(
+    serverConstants.serviceName,
+    ErrorType.INTERNAL,
+    Status.INTERNAL_SERVER_ERROR.valueOf(),
+    "InternalServerError",
+    details || "An internal server error occured"
+  );
+}

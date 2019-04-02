@@ -37,5 +37,6 @@ export class Parameter {
 
 export enum ParameterType {
   QUERY = "query",
-  BODY = "body"
+  BODY = "body",
+  URL = "url"
 }

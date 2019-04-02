@@ -50,8 +50,8 @@ function validateParameters(
   // Formulate response
   if (missingParams.length != 0) {
     create422("missing parameters: " + missingParams.map(param => {
-          return param.toString();
-        }).join(", ")
+      return param.toString();
+    }).join(", ")
     ).writeResponse(res);
   }
 
@@ -89,6 +89,10 @@ function requestHasParameter(
     }
   } else if (parameterType === ParameterType.QUERY) {
     if (!req.query[parameterName]) {
+      return false;
+    }
+  } else if (parameterType === ParameterType.URL) {
+    if (!req.params[parameterName]) {
       return false;
     }
   }

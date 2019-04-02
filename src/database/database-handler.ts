@@ -15,6 +15,7 @@ export class DatabaseHandler {
     private constructor() {
         this.songDatabase = new Database("song");
         this.postSong("Old song", "Oldman", "Oldies");
+        this.putSong("song-0", "New song", "Newman", "Nuo Vogue");
         this.songDatabase.logBrief();
         console.debug();
 
@@ -45,7 +46,7 @@ export class DatabaseHandler {
         melody: string
     ): Entry | null {
         let song = new Song(title, artist, melody);
-        this.songDatabase.save(id);
+        this.songDatabase.saveRevision(id);
         return this.songDatabase.put(id, song);
     }
 
@@ -58,7 +59,7 @@ export class DatabaseHandler {
         let entry = this.songDatabase.get(id);
         if (entry) {
             let song: Song = entry.entryData as Song;
-            this.songDatabase.save(id);
+            this.songDatabase.saveRevision(id);
             if (title) {
                 song.title = title;
             }
@@ -75,7 +76,7 @@ export class DatabaseHandler {
     }
 
     public deleteSong(id: string) {
-        this.songDatabase.save(id);
+        this.songDatabase.saveRevision(id);
         return this.songDatabase.delete(id);
     }
 
@@ -88,11 +89,27 @@ export class DatabaseHandler {
     }
 
     public getSongs() {
-        return this.songDatabase.getCollection();
+        return this.songDatabase.getAll();
     }
 
     public getSongsIndex() {
         return this.songDatabase.getIndex();
+    }
+
+    public recoverSongRevision(id: string, revision: number) {
+        return this.songDatabase.recoverRevision(id, revision);
+    }
+
+    public dropSongRevision(id: string, revision: number) {
+        return this.songDatabase.dropRevision(id, revision);
+    }
+
+    public recoverAllSongRevisions(id: string) {
+        return this.songDatabase.recoverAllRevisions(id);
+    }
+
+    public purgeSong(id: string) {
+        return this.songDatabase.purge(id);
     }
 
     // ARTIST
@@ -114,7 +131,7 @@ export class DatabaseHandler {
     }
 
     public getArtists() {
-        return this.artistDatabase.getCollection();
+        return this.artistDatabase.getAll();
     }
 
     public getArtistsIndex() {
@@ -140,7 +157,7 @@ export class DatabaseHandler {
     }
 
     public getMelodies() {
-        return this.melodyDatabase.getCollection();
+        return this.melodyDatabase.getAll();
     }
 
     public getMelodiesIndex() {

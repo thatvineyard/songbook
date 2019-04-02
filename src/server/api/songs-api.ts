@@ -4,7 +4,7 @@ import serverConstants from "../../constants/serverConstants";
 import { DatabaseHandler } from "../../database/database-handler";
 import { ApiBuilder } from "./api-framework/api-builder";
 import { Parameter, ParameterType } from "./api-framework/parameter";
-import { create404, create422 } from "./error-handler/errorFactory";
+import { create404, create422, create500 } from "./error-handler/errorFactory";
 import { ErrorResponse } from "./error-handler/error-response";
 import { Song } from "models/song";
 
@@ -24,59 +24,139 @@ let paramQueryIdRequired = new Parameter(ParameterType.QUERY, "id", "string", tr
 let paramQueryIdOptional = new Parameter(ParameterType.QUERY, "id", "string", false);
 let paramBodyIdRequired = new Parameter(ParameterType.BODY, "id", "string", true);
 let paramBodyIdOptional = new Parameter(ParameterType.BODY, "id", "string", false);
+let paramUrlIdRequired = new Parameter(ParameterType.URL, "id", "string", true);
+let paramUrlIdOptional = new Parameter(ParameterType.URL, "id", "string", false);
 
-let paramQueryRevisionRequired = new Parameter(ParameterType.QUERY, "revision", "integer", true);
+let paramUrlRevisionRequired = new Parameter(ParameterType.QUERY, "revision", "integer", true);
+let paramBodyRevisionOptional = new Parameter(ParameterType.QUERY, "revision", "integer", false);
 let paramBodyRefsList = new Parameter(ParameterType.BODY, "refs", "list of strings", false);
 
+
+//=========================================================================//
+/**
+ * GET SONGS
+ */
+//=========================================================================//
+
+// Function
+function getSong(req: Request, res: Response): void {
+
+  // Extract variables  
+  let id = req.params.id;
+
+  // Do
+  let db = DatabaseHandler.Instance;
+  let result = db.getSong(id);
+
+  // Validate result
+  if (result == null) {
+    create404("No song found at id " + id).sendResponse(res);
+    break;
+  }
+
+  // Respond
+  res.send(result);
+
+}
+
+// PARAMS
+let getSongParams: Parameter[] = [paramUrlIdRequired];
+
+// API
+songsApiBuilder.addGet(serverConstants.collectionUrl + "/:id", getSong, "Get songs", getSongParams);
+
+//=========================================================================//
+/**
+ * GET SONGS
+ */
+//=========================================================================//
+
+// Function
+function getSongs(req: Request, res: Response): void {
+
+  // Do
+  let db = DatabaseHandler.Instance;
+  let result = db.getSongs();
+
+  // Validate result
+  if (!result) {
+    create500("Error when getting songs");
+  }
+
+  // Respond
+  res.send(db.getSongs());
+
+}
+
+// PARAMS
+let getSongsParams: Parameter[] = [];
+
+// API
+songsApiBuilder.addGet(serverConstants.collectionUrl, getSongs, "Get songs", getSongsParams);
+
+//=========================================================================//
 /**
  * PUT SONGS
  */
+//=========================================================================//
 
 // Function
 function putSong(req: Request, res: Response): void {
-  if (req.query.id && req.body.title && req.body.artist && req.body.melody) {
-    let id = req.query.id;
-    let title = req.body.title;
-    let artist = req.body.artist;
-    let melody = req.body.melody;
 
-    let db = DatabaseHandler.Instance;
+  // Extracting variables
+  let id = req.params.id;
+  let title = req.body.title;
+  let artist = req.body.artist;
+  let melody = req.body.melody;
 
-    let result = db.putSong(id, title, artist, melody);
-    if (result) {
-      res.send(result);
-    } else {
-      create404("No entry found, use post to create a new entry").sendResponse(res);
-    }
+  // Do
+  let db = DatabaseHandler.Instance;
+  let result = db.putSong(id, title, artist, melody);
+
+  // Validate result
+  if (!result) {
+    create404("No entry found, use post to create a new entry").sendResponse(res);
+    return;
   }
+
+  // Respond
+  res.send(result);
+
 }
 
 // Params
-let putSongParams: Parameter[] = [paramQueryIdRequired, paramBodyTitleRequired, paramBodyArtistRequired, paramBodyMelodyRequired];
+let putSongParams: Parameter[] = [paramUrlIdRequired, paramBodyTitleRequired, paramBodyArtistRequired, paramBodyMelodyRequired];
 
 // API
-songsApiBuilder.addPut(serverConstants.collectionUrl, putSong, "Put song", putSongParams);
+songsApiBuilder.addPut(serverConstants.collectionUrl + "/:id", putSong, "Put song", putSongParams);
 
+
+//=========================================================================//
 /**
  * POST SONGS
  */
+//=========================================================================//
 
 // Function
 function postSong(req: Request, res: Response): void {
-  if (req.body.title && req.body.artist && req.body.melody) {
-    let title = req.body.title;
-    let artist = req.body.artist;
-    let melody = req.body.melody;
 
-    let db = DatabaseHandler.Instance;
-    let id = db.postSong(title, artist, melody);
+  // Extract variables
+  let title = req.body.title;
+  let artist = req.body.artist;
+  let melody = req.body.melody;
 
-    res.status(Status.CREATED).send(id);
-  } else {
-    create422(
-      "The body parameter title was " + typeof req.body.title
-    ).sendResponse(res);
+  // Do
+  let db = DatabaseHandler.Instance;
+  let id = db.postSong(title, artist, melody);
+
+  if (!id) {
+    create500("Posting returned no id, may not have been succesfull");
+    return;
   }
+
+  // Respond
+  res.status(Status.CREATED).send(id);
+
 }
 
 // Params
@@ -85,97 +165,77 @@ let postSongParams: Parameter[] = [paramBodyTitleRequired, paramBodyArtistRequir
 // API
 songsApiBuilder.addPost(serverConstants.collectionUrl, postSong, "Post song", postSongParams);
 
+//=========================================================================//
 /**
  * PATCH SONG
  */
+//=========================================================================//
 
 // Function
 function patchSong(req: Request, res: Response): void {
-  if (req.query.id && (req.body.title || req.body.artist || req.body.melody || true)) {
-    let id = req.query.id;
-    let title = req.body.title;
-    let artist = req.body.artist;
-    let melody = req.body.melody;
 
-    let db = DatabaseHandler.Instance;
+  // Extract variables
+  let id = req.params.id;
+  let title = req.body.title;
+  let artist = req.body.artist;
+  let melody = req.body.melody;
 
-    let result = db.patchSong(id, title, artist, melody);
-    if (result) {
-      res.send(result);
-    } else {
-      create404("No entry found, use post to create a new entry").sendResponse(res);
-    }
+  // Do
+  let db = DatabaseHandler.Instance;
+  let result = db.patchSong(id, title, artist, melody);
+
+  // Validate result
+  if (!result) {
+    create404("No entry found, use post to create a new entry").sendResponse(res);
+    return;
   }
+
+  // Respond
+  res.send(result);
+
 }
 
 // Params
-let patchSongParams: Parameter[] = [paramQueryIdRequired, paramBodyTitleOptional, paramBodyArtistOptional, paramBodyMelodyOptional];
+let patchSongParams: Parameter[] = [paramUrlIdRequired, paramBodyTitleOptional, paramBodyArtistOptional, paramBodyMelodyOptional];
 
 // API
-songsApiBuilder.addPatch(serverConstants.collectionUrl, patchSong, "Patch song", patchSongParams);
+songsApiBuilder.addPatch(serverConstants.collectionUrl + "/:id", patchSong, "Patch song", patchSongParams);
 
-
+//=========================================================================//
 /**
  * DELETE SONG
  */
+//=========================================================================//
 
 // Function
 function deleteSong(req: Request, res: Response): void {
-  if (req.query.id) {
-    let id = req.query.id;
+  // Extract variables
+  let id = req.params.id;
 
-    let db = DatabaseHandler.Instance;
-    let success = db.deleteSong(id);
+  // Do
+  let db = DatabaseHandler.Instance;
+  let result = db.deleteSong(id);
 
-    if (success) {
-      res.status(Status.NO_CONTENT).send();
-    } else {
-      create404("No song found at id " + id).sendResponse(res);
-    }
-  } else {
-    create422("The query parameter Id was " + typeof req.query.id).sendResponse(
-      res
-    );
+  // Validate result
+  if (!result) {
+    create404("No song found at id " + id).sendResponse(res);
+    return;
   }
+
+  res.send(result);
 }
 
 // Params
-let deleteSongParams: Parameter[] = [paramQueryIdRequired];
+let deleteSongParams: Parameter[] = [paramUrlIdRequired];
 
 // API
-songsApiBuilder.addDelete(serverConstants.collectionUrl, deleteSong, "Delete song", deleteSongParams);
+songsApiBuilder.addDelete(serverConstants.collectionUrl + "/:id", deleteSong, "Delete song", deleteSongParams);
 
-/**
- * GET SONGS
- */
-
-// Function
-function getSongs(req: Request, res: Response): void {
-  let db = DatabaseHandler.Instance;
-
-  if (req.query.id) {
-    let id = req.query.id;
-    let result = db.getSong(id);
-
-    if (result !== null) {
-      res.send(result);
-    } else {
-      create404("No song found at id " + id).sendResponse(res);
-    }
-  } else {
-    res.send(db.getSongs());
-  }
-}
-
-// PARAMS
-let getSongsParams: Parameter[] = [paramQueryIdOptional, paramBodyRefsList];
-
-// API
-songsApiBuilder.addGet(serverConstants.collectionUrl, getSongs, "Get songs", getSongsParams);
-
+//=========================================================================//
 /**
  * GET SONGS INDEX
  */
+//=========================================================================//
 
 // Function
 function getSongsIndex(req: Request, res: Response): void {
@@ -188,89 +248,162 @@ songsApiBuilder.addGet(
   "Get song index"
 );
 
-/**
- * GET SONGS ACTION
- */
-
-// Function
-function getSongsAction(req: Request, res: Response): void {
-  res.send("Action performed");
-}
-songsApiBuilder.addGet(
-  serverConstants.actionUrl,
-  getSongsAction,
-  "Temporary action"
-);
-
+//=========================================================================//
 /**
  * HISTORY: GET SONG REVISIONS
  */
-function getSongRevision(req: Request, res: Response): void {
+//=========================================================================//
+
+function recoverSongRevisions(req: Request, res: Response): void {
+
+  // Extract variables
+  let id = req.params.id;
+
+  // Do
   let db = DatabaseHandler.Instance;
+  let result = db.recoverAllSongRevisions(id);
 
-  if (req.query.id) {
-    let id = req.query.id;
-    let result = db.getSong(id);
-
-    if (result !== null) {
-      res.send(result);
-    } else {
-      create404("No song found at id " + id).sendResponse(res);
-    }
-  } else {
-    res.send(db.get());
+  // Validate result
+  if (!result) {
+    create404("Song not found");
   }
+
+  // Respond
+  res.send(result);
+
 }
 
 // Params
-let getSongRevisionParams: Parameter[] = [paramQueryIdRequired, paramQueryRevisionRequired];
+let recoverSongRevisionsParams: Parameter[] = [paramBodyIdRequired];
 
 // API
-songsApiBuilder.addGet(serverConstants.historyUrl, getSongRevision, "Get song revision", getSongRevisionParams);
+songsApiBuilder.addGet(serverConstants.collectionUrl + "/:id" + serverConstants.historyUrl, recoverSongRevisions, "Recover song revision(s)", recoverSongRevisionsParams);
 
+//=========================================================================//
+/**
+ * HISTORY: GET SONG REVISION
+ */
+//=========================================================================//
+
+function recoverSongRevision(req: Request, res: Response): void {
+
+  // Validate inputs
+  if (!parseInt(req.params.revision)) {
+    create422("Revision must be a number (was '" + req.params.revision + "')").sendResponse(res);
+    return;
+  }
+
+  // Extract variables
+  let id = req.params.id;
+  let revision = parseInt(req.params.revision);
+
+  // Do  
+  let db = DatabaseHandler.Instance;
+  let result = db.recoverSongRevision(id, revision);
+
+  // Validate result
+  if (result == null) {
+    create404("No revision found at id: " + id + " rev: " + revision).sendResponse(res);
+    return;
+  }
+
+  // Respond
+  res.send(result);
+
+}
+
+
+// Params
+let recoverSongRevisionParams: Parameter[] = [paramUrlIdRequired, paramUrlRevisionRequired];
+
+// API
+songsApiBuilder.addGet(serverConstants.collectionUrl + "/:id" + serverConstants.historyUrl + "/:revision", recoverSongRevision, "Recover song revision(s)", recoverSongRevisionParams);
+
+//=========================================================================//
 /**
  * HISTORY: DROP SONG REVISION
  */
+//=========================================================================//
+
 function dropSongRevision(req: Request, res: Response): void {
-  let db = DatabaseHandler.Instance;
 
-  if (req.query.id) {
-    let id = req.query.id;
-    let result = db.getSong(id);
-
-    if (result !== null) {
-      res.send(result);
-    } else {
-      create404("No song found at id " + id).sendResponse(res);
-    }
-  } else {
-    res.send(db.getSongs());
+  // Validate params
+  if (!(req.params.id && req.params.revision)) {
+    create422("Invalid parameters");
+    return;
   }
+
+  // Validate types
+  if (!parseInt(req.params.revision)) {
+    create422("Revision must be a number (was '" + req.params.revision + "')").sendResponse(res);
+    return;
+  }
+
+  // Get params
+  let id = req.params.id;
+  let revision = parseInt(req.params.revision);
+
+  // Do 
+  let db = DatabaseHandler.Instance;
+  let result = db.dropSongRevision(id, revision);
+
+  // Validate answer
+  if (result === null) {
+    create404("No song found at id " + id).sendResponse(res);
+    return;
+  }
+
+  res.send(result);
+
 }
 
 // Params
-let dropSongRevisionParams: Parameter[] = [paramQueryIdRequired, paramQueryRevisionRequired];
+let dropSongRevisionParams: Parameter[] = [paramUrlIdRequired, paramUrlRevisionRequired];
 
 // API
-songsApiBuilder.addDelete(serverConstants.historyUrl, dropSongRevision, "Drop song revision", dropSongRevisionParams);
+songsApiBuilder.addDelete(serverConstants.collectionUrl + "/:id" + serverConstants.historyUrl + "/:revision", dropSongRevision, "Drop song revision", dropSongRevisionParams);
 
+//=========================================================================//
 /**
  * ACTION: PURGE SONG
  */
+//=========================================================================//
+
 function purgeSong(req: Request, res: Response): void {
+
+  // Extract variables
+  let id = req.params.id;
+
+  // Prepare database
   let db = DatabaseHandler.Instance;
 
+  // Validate database
+  if (!db.hasSong(id)) {
+    create404("Song with id " + id + " not found.").sendResponse(res);
+    return;
+  }
+
+  // Do
+  db.purgeSong(id);
+
+  console.log(db.getSongs());
+
+  // Respond
+  res.status(Status.NO_CONTENT).send();
 }
 
 // Params
 let purgeSongParams: Parameter[] = [paramBodyIdRequired];
 
 // API
-songsApiBuilder.addPost(serverConstants.actionUrl + "/purge", dropSongRevision, "Purge song revision", dropSongRevisionParams);
+songsApiBuilder.addPost(serverConstants.collectionUrl + "/:id" + serverConstants.actionUrl + "/purge", purgeSong, "Purge song", purgeSong);
 
+//=========================================================================//
 /**
  * ACTION: PURGE REVISION 
  */
+//=========================================================================//
+
 function restoreSongRevision(req: Request, res: Response): void {
   let db = DatabaseHandler.Instance;
 
@@ -289,7 +422,7 @@ function restoreSongRevision(req: Request, res: Response): void {
 }
 
 // Params
-let restoreSongParams: Parameter[] = [paramQueryIdRequired, paramQueryRevisionRequired];
+let restoreSongParams: Parameter[] = [paramUrlIdRequired, paramUrlRevisionRequired];
 
 // API
 songsApiBuilder.addPost(serverConstants.actionUrl + "/restore", restoreSongRevision, "Restore song revision", restoreSongParams);
