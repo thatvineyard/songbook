@@ -2,7 +2,7 @@ import { Song } from "../models/song";
 import { Entry } from "./entry";
 import { Artist } from "../models/artist";
 import { Melody } from "../models/melody";
-import colors from 'colors';
+import colors from "colors";
 import { IdGenerator } from "./id";
 
 export class DatabaseHandler {
@@ -41,24 +41,34 @@ export class DatabaseHandler {
     return this.songDatabase.post(song);
   }
 
-  public putSong(id: string, title: string, artist: string, melody: string): Entry | null {
+  public putSong(
+    id: string,
+    title: string,
+    artist: string,
+    melody: string
+  ): Entry | null {
     let song = new Song(title, artist, melody);
     this.songDatabase.save(id);
     return this.songDatabase.put(id, song);
   }
-  
-  public patchSong(id: string, title?: string, artist?: string, melody?: string): Entry | null {
+
+  public patchSong(
+    id: string,
+    title?: string,
+    artist?: string,
+    melody?: string
+  ): Entry | null {
     let entry = this.songDatabase.get(id);
     if (entry) {
       let song: Song = entry.entryData as Song;
       this.songDatabase.save(id);
-      if(title) {
+      if (title) {
         song.title = title;
       }
-      if(artist) {
+      if (artist) {
         song.artist = artist;
       }
-      if(melody) {
+      if (melody) {
         song.melody = melody;
       }
       return this.songDatabase.put(id, song);
@@ -161,13 +171,13 @@ class Database {
   }
 
   public save(id: string): void {
-    let oldEntry = {...this.get(id)} as Entry;
+    let oldEntry = { ...this.get(id) } as Entry;
     this.removedEntries.push(oldEntry);
-    console.dir({removedEntries: this.removedEntries}, {depth: null});
+    console.dir({ removedEntries: this.removedEntries }, { depth: null });
   }
 
   public update(id: string, data: object): Entry | null {
-    let entry = this.get(id)
+    let entry = this.get(id);
     if (entry) {
       entry.update(data);
     }
