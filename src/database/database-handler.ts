@@ -8,22 +8,22 @@ import { Entry } from "./entry";
 export class DatabaseHandler {
     private static _instance: DatabaseHandler;
 
-    private songDatabase: Database;
-    private melodyDatabase: Database;
-    private artistDatabase: Database;
+    private songDatabase: Database<Song>;
+    private melodyDatabase: Database<Melody>;
+    private artistDatabase: Database<Artist>;
 
     private constructor() {
-        this.songDatabase = new Database("song");
+        this.songDatabase = new Database<Song>("song");
         this.postSong("Old song", "Oldman", "Oldies");
         this.putSong("song-0", "New song", "Newman", "Nuo Vogue");
         this.songDatabase.logBrief();
         console.debug();
 
-        this.melodyDatabase = new Database("melody");
+        this.melodyDatabase = new Database<Melody>("melody");
         this.melodyDatabase.logBrief();
         console.debug();
 
-        this.artistDatabase = new Database("aritst");
+        this.artistDatabase = new Database<Artist>("aritst");
         this.postArtist("Carl", "Wangman");
         this.artistDatabase.logBrief();
         console.debug();
@@ -44,7 +44,7 @@ export class DatabaseHandler {
         title: string,
         artist: string,
         melody: string
-    ): Entry | null {
+    ): Entry<Song> | null {
         let song = new Song(title, artist, melody);
         this.songDatabase.saveRevision(id);
         return this.songDatabase.put(id, song);
@@ -55,7 +55,7 @@ export class DatabaseHandler {
         title?: string,
         artist?: string,
         melody?: string
-    ): Entry | null {
+    ): Entry<Song> | null {
         let entry = this.songDatabase.get(id);
         if (entry) {
             let song: Song = entry.entryData as Song;
@@ -84,7 +84,7 @@ export class DatabaseHandler {
         return this.songDatabase.has(id);
     }
 
-    public getSong(id: string): Entry | null {
+    public getSong(id: string): Entry<Song> | null {
         return this.songDatabase.get(id);
     }
 
@@ -126,7 +126,7 @@ export class DatabaseHandler {
         return this.artistDatabase.has(id);
     }
 
-    public getArtist(id: string): Entry | null {
+    public getArtist(id: string): Entry<Artist> | null {
         return this.artistDatabase.get(id);
     }
 
@@ -152,7 +152,7 @@ export class DatabaseHandler {
         return this.melodyDatabase.has(id);
     }
 
-    public getMelody(id: string): Entry | null {
+    public getMelody(id: string): Entry<Melody> | null {
         return this.melodyDatabase.get(id);
     }
 

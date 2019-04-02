@@ -51,7 +51,7 @@ function getSong(req: Request, res: Response): void {
   // Validate result
   if (result == null) {
     create404("No song found at id " + id).sendResponse(res);
-    break;
+    return;
   }
 
   // Respond
@@ -96,6 +96,42 @@ songsApiBuilder.addGet(serverConstants.collectionUrl, getSongs, "Get songs", get
 
 //=========================================================================//
 /**
+ * POST SONGS
+ */
+//=========================================================================//
+
+// Function
+function postSong(req: Request, res: Response): void {
+
+  // Extract variables
+  let title = req.body.title;
+  let artist = req.body.artist;
+  let melody = req.body.melody;
+
+  // Prepare database
+  let db = DatabaseHandler.Instance;
+
+  // Do
+  let id = db.postSong(title, artist, melody);
+
+  if (!id) {
+    create500("Posting returned no id, may not have been succesfull");
+    return;
+  }
+
+  // Respond
+  res.status(Status.CREATED).send(id);
+
+}
+
+// Params
+let postSongParams: Parameter[] = [paramBodyTitleRequired, paramBodyArtistRequired, paramBodyMelodyRequired];
+
+// API
+songsApiBuilder.addPost(serverConstants.collectionUrl, postSong, "Post song", postSongParams);
+
+//=========================================================================//
+/**
  * PUT SONGS
  */
 //=========================================================================//
@@ -109,8 +145,16 @@ function putSong(req: Request, res: Response): void {
   let artist = req.body.artist;
   let melody = req.body.melody;
 
-  // Do
+  // Prepare database
   let db = DatabaseHandler.Instance;
+
+  // Validate database
+  if (!db.hasSong(id)) {
+    create404("Song with id " + id + " not found.").sendResponse(res);
+    return;
+  }
+
+  // Do
   let result = db.putSong(id, title, artist, melody);
 
   // Validate result
@@ -133,40 +177,6 @@ songsApiBuilder.addPut(serverConstants.collectionUrl + "/:id", putSong, "Put son
 
 //=========================================================================//
 /**
- * POST SONGS
- */
-//=========================================================================//
-
-// Function
-function postSong(req: Request, res: Response): void {
-
-  // Extract variables
-  let title = req.body.title;
-  let artist = req.body.artist;
-  let melody = req.body.melody;
-
-  // Do
-  let db = DatabaseHandler.Instance;
-  let id = db.postSong(title, artist, melody);
-
-  if (!id) {
-    create500("Posting returned no id, may not have been succesfull");
-    return;
-  }
-
-  // Respond
-  res.status(Status.CREATED).send(id);
-
-}
-
-// Params
-let postSongParams: Parameter[] = [paramBodyTitleRequired, paramBodyArtistRequired, paramBodyMelodyRequired];
-
-// API
-songsApiBuilder.addPost(serverConstants.collectionUrl, postSong, "Post song", postSongParams);
-
-//=========================================================================//
-/**
  * PATCH SONG
  */
 //=========================================================================//
@@ -180,8 +190,16 @@ function patchSong(req: Request, res: Response): void {
   let artist = req.body.artist;
   let melody = req.body.melody;
 
-  // Do
+  // Prepare database
   let db = DatabaseHandler.Instance;
+
+  // Validate database
+  if (!db.hasSong(id)) {
+    create404("Song with id " + id + " not found.").sendResponse(res);
+    return;
+  }
+
+  // Do
   let result = db.patchSong(id, title, artist, melody);
 
   // Validate result
@@ -212,8 +230,16 @@ function deleteSong(req: Request, res: Response): void {
   // Extract variables
   let id = req.params.id;
 
-  // Do
+  // Prepare database
   let db = DatabaseHandler.Instance;
+
+  // Validate database
+  if (!db.hasSong(id)) {
+    create404("Song with id " + id + " not found.").sendResponse(res);
+    return;
+  }
+
+  // Do
   let result = db.deleteSong(id);
 
   // Validate result
@@ -259,8 +285,16 @@ function recoverSongRevisions(req: Request, res: Response): void {
   // Extract variables
   let id = req.params.id;
 
-  // Do
+  // Prepare database
   let db = DatabaseHandler.Instance;
+
+  // Validate database
+  if (!db.hasSong(id)) {
+    create404("Song with id " + id + " not found.").sendResponse(res);
+    return;
+  }
+
+  // Do
   let result = db.recoverAllSongRevisions(id);
 
   // Validate result
@@ -297,8 +331,16 @@ function recoverSongRevision(req: Request, res: Response): void {
   let id = req.params.id;
   let revision = parseInt(req.params.revision);
 
-  // Do  
+  // Prepare database
   let db = DatabaseHandler.Instance;
+
+  // Validate database
+  if (!db.hasSong(id)) {
+    create404("Song with id " + id + " not found.").sendResponse(res);
+    return;
+  }
+
+  // Do
   let result = db.recoverSongRevision(id, revision);
 
   // Validate result
@@ -343,8 +385,16 @@ function dropSongRevision(req: Request, res: Response): void {
   let id = req.params.id;
   let revision = parseInt(req.params.revision);
 
-  // Do 
+  // Prepare database
   let db = DatabaseHandler.Instance;
+
+  // Validate database
+  if (!db.hasSong(id)) {
+    create404("Song with id " + id + " not found.").sendResponse(res);
+    return;
+  }
+
+  // Do
   let result = db.dropSongRevision(id, revision);
 
   // Validate answer
@@ -396,7 +446,7 @@ function purgeSong(req: Request, res: Response): void {
 let purgeSongParams: Parameter[] = [paramBodyIdRequired];
 
 // API
-songsApiBuilder.addPost(serverConstants.collectionUrl + "/:id" + serverConstants.actionUrl + "/purge", purgeSong, "Purge song", purgeSong);
+songsApiBuilder.addPost(serverConstants.collectionUrl + "/:id" + serverConstants.actionUrl + "/purge", purgeSong, "Purge song", purgeSongParams);
 
 //=========================================================================//
 /**

@@ -20,10 +20,10 @@ import colors from "colors";
  *  
  *  - purge: Remove an Entry from history based on a unique identifier and revision number. 
  */
-export class Database {
+export class Database<T extends object> {
   name: string;
-  collection: Entry[];
-  history: Entry[];
+  collection: Entry<T>[];
+  history: Entry<T>[];
   idGenerator: IdGenerator;
 
   constructor(name: string) {
@@ -47,13 +47,13 @@ export class Database {
    * - update
    */
   //=========================================================================//
-  private create(data: object): Entry {
-    let entry = new Entry(data, this.idGenerator);
+  private create(data: T): Entry<T> {
+    let entry = new Entry<T>(data, this.idGenerator);
     this.collection.push(entry);
     return entry;
   }
 
-  private update(id: string, data: object): Entry | null {
+  private update(id: string, data: T | null): Entry<T> | null {
     let entry = this.get(id);
     if (entry) {
       entry.update(data);
@@ -61,8 +61,8 @@ export class Database {
     return entry;
   }
 
-  public get(id: string): Entry | null {
-    let result: Entry | null = null;
+  public get(id: string): Entry<T> | null {
+    let result: Entry<T> | null = null;
 
     this.collection.forEach(entry => {
       if (entry.idEquals(id)) {
@@ -83,16 +83,16 @@ export class Database {
   }
 
   public getIndex() {
-    return this.collection.map((entry: Entry) => {
+    return this.collection.map((entry: Entry<T>) => {
       return entry.getId();
     });
   }
 
-  public post(data: object): string {
+  public post(data: T): string {
     return this.create(data).getId();
   }
 
-  public put(id: string, data: object): Entry | null {
+  public put(id: string, data: T | null): Entry<T> | null {
     if (this.has(id)) {
       return this.update(id, data);
     } else {
@@ -100,7 +100,7 @@ export class Database {
     }
   }
 
-  public delete(id: string): Entry | null {
+  public delete(id: string): Entry<T> | null {
     if (this.has(id)) {
       return this.put(id, null);
     } else {
@@ -133,7 +133,7 @@ export class Database {
   //=========================================================================//
   private enforceRevisionHistoryLimit(id: string) {
     let entryRevisions = this.history.filter(
-      (entry: Entry) => entry.getId() === id
+      (entry: Entry<T>) => entry.getId() === id
     );
     if (entryRevisions.length > databaseConstants.maxRevisionHistory) {
       let earliestRevision = this.getEarliestRevisionNumber(entryRevisions);
@@ -141,7 +141,7 @@ export class Database {
   }
 
   public dropRevision(id: string, revision: number): void {
-    this.history = this.history.filter((entry: Entry) => {
+    this.history = this.history.filter((entry: Entry<T>) => {
       if (entry.getId() === id) {
         if (entry.revision === revision) {
           return false;
@@ -151,8 +151,8 @@ export class Database {
     });
   }
 
-  public recoverRevision(id: string, revision: number): Entry | null {
-    let result = this.history.filter((entry: Entry) => {
+  public recoverRevision(id: string, revision: number): Entry<T> | null {
+    let result = this.history.filter((entry: Entry<T>) => {
       if (entry.getId() === id && entry.revision === revision) {
         return true;
       }
@@ -161,8 +161,8 @@ export class Database {
     return result[0] || null;
   }
 
-  public recoverAllRevisions(id: string): Entry[] | null {
-    let result = this.history.filter((entry: Entry) => {
+  public recoverAllRevisions(id: string): Entry<T>[] | null {
+    let result = this.history.filter((entry: Entry<T>) => {
       if (entry.getId() === id) {
         return true;
       }
@@ -171,18 +171,18 @@ export class Database {
     return result;
   }
 
-  public restoreRevision(id: string, revision: number): Entry | null {
-    let recoveredEntry: Entry | null = this.recoverRevision(id, revision);
-    if (recoveredEntry != null) {
-      return this.put(id, Object.assign(Object.create(recoveredEntry.entryData), recoveredEntry.entryData));
+  public restoreRevision(id: string, revision: number): Entry<T> | null {
+    let recoveredEntry: Entry<T> | null = this.recoverRevision(id, revision);
+    if (recoveredEntry != null && recoveredEntry.entryData != null) {
+      return this.put(id, Object.assign<T, T>(Object.create(recoveredEntry.entryData), recoveredEntry.entryData!));
     } else {
       return null;
     }
   }
 
-  private getEarliestRevisionNumber(entryRevisions: Entry[]) {
+  private getEarliestRevisionNumber(entryRevisions: Entry<T>[]) {
     let minRevision: number = Infinity;
-    entryRevisions.forEach((entry: Entry) => {
+    entryRevisions.forEach((entry: Entry<T>) => {
       if (minRevision === undefined || entry.revision < minRevision) {
         minRevision = entry.revision;
       }
@@ -191,10 +191,10 @@ export class Database {
   }
 
   public saveRevision(id: string): void {
-    let oldEntry: Entry = Object.assign(
+    let oldEntry: Entry<T> = Object.assign(
       Object.create(this.get(id)),
       this.get(id)
-    ) as Entry;
+    ) as Entry<T>;
     this.history.push(oldEntry);
     this.enforceRevisionHistoryLimit(oldEntry.getId());
     console.dir({ removedEntries: this.history }, { depth: null });
@@ -214,14 +214,12 @@ export class Database {
   //=========================================================================//
   public purge(id: string): void {
     if (this.has(id)) {
-      this.collection = this.collection.filter((entry: Entry) => {
+      this.collection = this.collection.filter((entry: Entry<T>) => {
         return (entry.getId() !== id);
       })
-      this.history = this.collection.filter((entry: Entry) => {
+      this.history = this.collection.filter((entry: Entry<T>) => {
         return (entry.getId() !== id);
       })
-    } else {
-      return null;
     }
   }
 
