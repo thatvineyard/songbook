@@ -3,10 +3,12 @@
 FROM node:8-alpine as builder
 WORKDIR /usr/src/app
 
-# Copy 
+# Install NPM 
 COPY package*.json ./
-
 RUN npm install
+
+# Build app
+COPY . .
 RUN npm run build
 
 
