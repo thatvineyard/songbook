@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as Status from "http-status-codes";
 import serverConstants from "../../constants/serverConstants";
-import { DatabaseHandler } from "../../database/database";
+import { DatabaseHandler } from "../../database/database-handler";
 import { ApiBuilder } from "./api-framework/api-builder";
 import { Parameter, ParameterType } from "./api-framework/parameter";
 import { create404, create422 } from "./error-handler/errorFactory";
