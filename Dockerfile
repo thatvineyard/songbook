@@ -18,8 +18,8 @@ FROM node:8-alpine
 WORKDIR /usr/src/app
 
 # Create environment
-COPY .env ./
-RUN source .env
+COPY .dockerenv ./
+RUN source .dockerenv
 
 # Copy app files
 COPY --from=builder /usr/src/app/package*.json ./
