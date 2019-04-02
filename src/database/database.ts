@@ -4,6 +4,7 @@ import { Artist } from "../models/artist";
 import { Melody } from "../models/melody";
 import colors from "colors";
 import { IdGenerator } from "./id";
+import databaseConstants from "../constants/databaseConstants";
 
 export class DatabaseHandler {
   private static _instance: DatabaseHandler;
@@ -170,9 +171,40 @@ class Database {
     return entry;
   }
 
+  private enforceRevisionHistoryLimit(id: string) {
+    let entryRevisions = this.removedEntries.filter(
+      (entry: Entry) => entry.getId() === id
+    );
+    if (entryRevisions.length > databaseConstants.maxRevisionHistory) {
+      let earliestRevision = this.getEarliestRevisionNumber(entryRevisions);
+      this.removedEntries = this.removedEntries.filter((entry: Entry) => {
+        if (entry.getId() === id) {
+          if (entry.revision === earliestRevision) {
+            return false;
+          }
+        }
+        return true;
+      });
+    }
+  }
+
+  private getEarliestRevisionNumber(entryRevisions: Entry[]) {
+    let minRevision: number = Infinity;
+    entryRevisions.forEach((entry: Entry) => {
+      if (minRevision === undefined || entry.revision < minRevision) {
+        minRevision = entry.revision;
+      }
+    }, this);
+    return minRevision;
+  }
+
   public save(id: string): void {
-    let oldEntry = { ...this.get(id) } as Entry;
+    let oldEntry: Entry = Object.assign(
+      Object.create(this.get(id)),
+      this.get(id)
+    ) as Entry;
     this.removedEntries.push(oldEntry);
+    this.enforceRevisionHistoryLimit(oldEntry.getId());
     console.dir({ removedEntries: this.removedEntries }, { depth: null });
   }
 
