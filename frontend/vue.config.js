@@ -1,3 +1,3 @@
 module.exports = {
-  publicPath: process.env.CONTEXT_ROOT || '/aaa/',
+  publicPath: process.env.CONTEXT_ROOT || '/',
 };
