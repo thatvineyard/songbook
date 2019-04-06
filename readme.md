@@ -1,64 +1,28 @@
 # Songbook
- 
-## Table of Contents
-- [API](#API)
-  - [v1](#v1)
 
-## API
+Consitsts of two modules:
 
-### v1
+- Frontend
+- Backend
 
-**Base Url**
+## Installing
 
-`/api/v1`
+|                            |                                                                         |
+| -------------------------- | ----------------------------------------------------------------------- |
+| `npm install`              | Install project-level dependencies (required for other install scripts) |
+| `npm run install-all`      | Install all dependencies                                                |
+| `npm run install-frontend` | Install frontend dependencies                                           |
+| `npm run install-backend`  | Install backend dependencies                                            |
 
-**Api Info**
+## Running
 
-Get up to date api information in relation to subpath by calling `GET:{base url}/api-info`.
+|                  |                   |                                                        |
+| ---------------- | ----------------- | ------------------------------------------------------ |
+| Start            | `npm run start`   | Compiles once and runs                                 |
+| Build            | `npm run build`   | Compiles but doesn't run                               |
+| Development-mode | `npm run dev`     | Compiles and re-runs on any changes to relevant files. |
+| Release          | `npm run release` | Compile and build docker images                        |
 
-Parameters:
- - **url** - Filter by url
- - **httpMethod** - Filter by http method (GET, POST, PUT etc...)
- - **options** - Options
-
-The api information shows:
- - possible paths
- - methods (not yet implemented)
-
->**Example**
->
-> Request:
->
-> `GET: {base url}/api-info`
-> ```
-> Headers:
-> Content-Type: application/json
->
-> Body: 
+> Note: By adding `-backend` or `-frontend` to any of the run scripts it will run the script for that module.
 > 
-> {
->   "url": "/api/v1/songs",
->   "httpMethod": "GET",
->   "options": ["brief"]
-> }
-> ```
->
-> Result:
-> ```
-> TODO
-> ```
-
-**Routes**
-
-- songs
-  - collection
-  - index
-  - actions
-- artists
-  - collection
-  - index
-  - actions
-- melodies
-  - collection
-  - index
-  - actions
+> For example if you want to run a backend that doesn't recompile and a frontend that recompiles, you can run `npm run start-frontend && npm run dev-backend`.

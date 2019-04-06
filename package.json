@@ -5,46 +5,23 @@
   "main": "src/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpileOnly ./src/app.ts",
-    "prod": "tsc && node ./out/app.js",
-    "start": "node ./out/app.js",
-    "build": "tsc"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/thatvineyard/songbook.git"
-  },
-  "keywords": [
-    "song",
-    "book",
-    "snaps",
-    "snapssong",
-    "lyrics",
-    "melody",
-    "snapsvisa",
-    "visa"
-  ],
-  "author": "Carl Wingårdh",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/thatvineyard/songbook/issues"
-  },
-  "homepage": "https://github.com/thatvineyard/songbook#readme",
-  "dependencies": {
-    "@types/express": "^4.16.1",
-    "@types/node": "^11.11.7",
-    "colors": "^1.3.3",
-    "express": "^4.16.4",
-    "http-status-codes": "^1.3.2"
+    "dev": "run-p dev-backend dev-frontend",
+    "dev-backend": "cd backend && npm run dev",
+    "dev-frontend": "cd frontend && npm run dev",
+    "start": "run-p dev-backend dev-frontend",
+    "start-backend": "cd backend && npm start",
+    "start-frontend": "cd frontend && npm start",
+    "build": "run-p build-backend build-frontend",
+    "build-backend": "cd backend && npm run build",
+    "build-frontend": "cd frontend && npm run build",
+    "release": "run-p release-backend release-frontend",
+    "release-backend": "cd backend && npm run release",
+    "release-frontend": "cd frontend && npm run release",
+    "install-all": "run-p install-frontend install-backend",
+    "install-frontend": "cd frontend && npm install",
+    "install-backend": "cd backend && npm install"
   },
   "devDependencies": {
-    "eslint": "^5.15.3",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.16.0",
-    "ts-node-dev": "^1.0.0-pre.32",
-    "tslint": "^5.14.0",
-    "tslint-config-airbnb": "^5.11.1",
-    "typescript": "^3.3.4000",
-    "typescript-tslint-plugin": "^0.3.1"
+    "npm-run-all": "^4.1.5"
   }
 }
