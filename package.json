@@ -8,7 +8,7 @@
     "dev": "run-p dev-backend dev-frontend",
     "dev-backend": "cd backend && npm run dev",
     "dev-frontend": "cd frontend && npm run dev",
-    "start": "run-p dev-backend dev-frontend",
+    "start": "run-p start-backend start-frontend",
     "start-backend": "cd backend && npm start",
     "start-frontend": "cd frontend && npm start",
     "build": "run-p build-backend build-frontend",

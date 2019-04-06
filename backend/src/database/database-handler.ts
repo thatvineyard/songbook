@@ -4,6 +4,7 @@ import { Melody } from "../models/melody";
 import { Song } from "../models/song";
 import { Database } from './database';
 import { Entry } from "./entry";
+import { populateSongs } from "./populate";
 
 export class DatabaseHandler {
     private static _instance: DatabaseHandler;
@@ -14,8 +15,7 @@ export class DatabaseHandler {
 
     private constructor() {
         this.songDatabase = new Database<Song>("song");
-        this.postSong("Old song", "Oldman", "Oldies");
-        this.putSong("song-0", "New song", "Newman", "Nuo Vogue");
+        populateSongs(this, 10);
         this.songDatabase.logBrief();
         console.debug();
 
