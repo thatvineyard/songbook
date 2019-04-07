@@ -113,7 +113,8 @@ export default Vue.extend({
 
     & .container div .bottom #lyrics .stanza .lyrics-preview {
       opacity: 1;
-      font-size: 1em;
+      font-size: unset;
+      // transition: 0.3s linear 0s;
     }
     & .container div .bottom #lyrics #lyrics-fog {
       opacity: 0;
@@ -213,9 +214,10 @@ export default Vue.extend({
         }
       }
       & #lyrics {
-        font-size: 0.8em;
+        font-size: 1em;
         text-align: center;
         max-height: 200px;
+        padding-bottom: 20px;
 
         & #lyrics-fog {
           height: 100%;
@@ -232,7 +234,7 @@ export default Vue.extend({
             #e1e1e6 80% #e1e1e6 90%
           );
           z-index: 2;
-          transition: 2s linear 0.2s;
+          transition: 0.3s linear 0.3s;
         }
 
         & .lyrics-teaser {
@@ -241,7 +243,7 @@ export default Vue.extend({
         & .lyrics-preview {
           opacity: 0;
           font-size: 0;
-          transition: font-size 0.3s, opacity 0.3s linear 0.1s;
+          transition: font-size 0.3s linear 0s, opacity 0.3s linear 0.3s;
         }
 
         & .stanza {
@@ -249,10 +251,10 @@ export default Vue.extend({
             color: lightgray;
             padding-left: 10%;
             text-align: left;
-            font-size: 0.8em;
+            font-size: 1em;
             margin: 0;
             font-style: italic;
-            font-weight: normal;
+            font-weight: bold;
           }
           margin-top: 10px;
           margin-bottom: 2px;
