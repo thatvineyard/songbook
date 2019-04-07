@@ -1,3 +1,5 @@
+import { Stanza } from './stanza';
+
 // object file for songs
 // metadata
 //   metadata: title, artistRef, melodyRef
@@ -11,13 +13,18 @@
 export class Song {
   title: string;
   artist: string;
-  melody: string
+  melody: string;
+  stanzas: Stanza[];
 
-  constructor(title: string, artist: string, melody: string) {
+  constructor(title: string, artist: string, melody: string, stanzas: Stanza[]) {
     console.log(" --> Creating Song");
     this.title = title;
     this.artist = artist;
     this.melody = melody;
+    this.stanzas = stanzas || [];
+    console.log(stanzas);
+    console.log(this.stanzas);
+    console.log(this);
   }
 
   // function addStanza (type: String, arrayOfLines) {
