@@ -62,9 +62,9 @@ body {
 
 h1,
 h2 {
-  font-family: Lato;
+  font-family: "Lato", Arial;
   font-weight: bold;
-  font-size: 1em;
+  font-size: 1.4em;
   letter-spacing: 2px;
   font-variant: small-caps;
 }

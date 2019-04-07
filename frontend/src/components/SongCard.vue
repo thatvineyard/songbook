@@ -7,27 +7,39 @@
             <h2>{{song.title}}</h2>
           </div>
           <div class="edit">
-            <p>◥</p>
+            <!-- <p>◥</p> -->
           </div>
         </div>
         <div class="bottom">
           <div id="info">
             <div class="melody">
-              <h3>Mel.</h3>
-              {{song.melody}}
+              <h3>Melody:</h3>
+              <p>
+                {{song.melody}}
+              </p>
             </div>
             <div class="artist">
-              <h3>Tex.</h3>
-              Tex. {{song.artist}}
+              <h3>Written by:</h3>
+              <p>
+                {{song.artist}}
+              </p>
             </div>
           </div>
           <div id='lyrics'>
-            <div class='stansa'>
-              <h4>Verse</h4>
-              <p> lyrics are lyrics </p>
-              <p> lyrics do a lot aof lyrics </p>
-              <p> lyrics and a more more lyric please </p>
-              <p> i want it lyrics </p>
+            <div id="lyrics-fog"></div>
+            <div class='stanza'>
+              <h4 class='lyrics-teaser'>Verse</h4>
+              <p class='lyrics-teaser'> lyrics are lyrics </p>
+              <p class='lyrics-teaser'> lyrics do a lot aof lyrics </p>
+              <p class='lyrics-teaser'> lyrics and a more more lyric please </p>
+              <p class='lyrics-preview'> i want it lyrics </p>
+            </div>
+            <div class='stanza'>
+              <h4 class='lyrics-preview'>Verse</h4>
+              <p class='lyrics-preview'> more lyrics are lyrics </p>
+              <p class='lyrics-preview'> more lyrics do a lot aof lyrics </p>
+              <p class='lyrics-preview'> more lyrics and a more more lyric please </p>
+              <p class='lyrics-preview'> more i want it lyrics </p>
             </div>
           </div>
         </div>
@@ -98,6 +110,14 @@ export default Vue.extend({
   &:hover {
     transform: scale(1) translate(0, -30px);
     box-shadow: 0px -30px 30px rgba(89, 92, 98, 0.5);
+
+    & .container div .bottom #lyrics .stanza .lyrics-preview {
+      opacity: 1;
+      font-size: 1em;
+    }
+    & .container div .bottom #lyrics #lyrics-fog {
+      opacity: 0;
+    }
   }
 
   .container {
@@ -124,14 +144,18 @@ export default Vue.extend({
       }
       .edit {
         text-align: right;
-        // width: 4em;
+        width: 10vh;
+        height: 10vh;
         margin-left: auto;
-        margin-right: 8px;
+        margin-right: 0;
         // margin-bottom: auto;
-
-        color: rgb(250, 250, 250);
+        background: linear-gradient(45deg, rgb(58, 60, 82) 50%, #8e92c7 50%);
+        opacity: 0.5;
+        // background: rgb(250, 250, 250);
         text-align: center;
         transition: 0.5s;
+
+        // transition: background 0.5s;
         font-size: 1.8em;
         & p {
           margin-top: 0;
@@ -140,8 +164,9 @@ export default Vue.extend({
         }
 
         &:hover {
-          text-shadow: 0px 0px 50px rgba(255, 255, 255, 0.4);
-          color: #ffffff;
+          // text-shadow: 0px 0px 50px rgba(255, 255, 255, 0.4);
+          // color: #ffffff;
+          opacity: 1;
         }
       }
     }
@@ -153,6 +178,7 @@ export default Vue.extend({
       padding-bottom: 2px;
       width: 96%;
       transition: transform 0.5s;
+      height: 70%;
 
       h1 {
         margin: 0;
@@ -171,10 +197,17 @@ export default Vue.extend({
         flex-wrap: wrap;
         & div {
           & h3 {
-            margin-bottom: 0;
+            margin: auto;
+            // margin-right: 2px;
           }
-          min-width: 200px;
-          width: 30%;
+          & p {
+            margin: auto;
+            // margin-left: 2px;
+          }
+          display: flex;
+          align-content: center;
+          // min-width: 200px;
+          // width: 30%;
           text-align: center;
           margin: auto;
         }
@@ -182,8 +215,36 @@ export default Vue.extend({
       & #lyrics {
         font-size: 0.8em;
         text-align: center;
+        max-height: 200px;
 
-        & .stansa {
+        & #lyrics-fog {
+          height: 100%;
+          width: 100%;
+          position: absolute;
+          top: 50px;
+          bottom: 0;
+          left: 0;
+          background: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0) 20%,
+            rgba(255, 255, 255, 1) 70%,
+            #e1e1e6 80% #e1e1e6 90%
+          );
+          z-index: 2;
+          transition: 2s linear 0.2s;
+        }
+
+        & .lyrics-teaser {
+          // display: none;
+        }
+        & .lyrics-preview {
+          opacity: 0;
+          font-size: 0;
+          transition: font-size 0.3s, opacity 0.3s linear 0.1s;
+        }
+
+        & .stanza {
           & h4 {
             color: lightgray;
             padding-left: 10%;
@@ -201,7 +262,7 @@ export default Vue.extend({
 
     .fade {
       box-shadow: 0px 0px 0px rgba(89, 92, 98, 0);
-      height: 50px;
+      height: 20px;
       background-image: linear-gradient(
         to bottom,
         rgb(255, 255, 255),
