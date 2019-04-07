@@ -67,7 +67,7 @@ export default Vue.extend({
 .wrapper {
   width: 80%;
   // height: 500px;
-  background: rgb(206, 206, 206);
+  background: rgb(209, 207, 193);
   margin: auto;
   margin-top: 2%;
   position: relative;
@@ -80,7 +80,7 @@ export default Vue.extend({
   transition: box-shadow 0.5s, transform 0.5s;
   &:hover {
     transform: scale(1);
-    box-shadow: 5px 20px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 5px 20px 30px rgba(254, 255, 242, 0.2);
   }
 
   .container {
@@ -93,7 +93,7 @@ export default Vue.extend({
       padding-bottom: 1px;
       padding-left: 10px;
       padding-right: 10px;
-      background: rgb(59, 59, 59);
+      background: rgb(71, 69, 65);
       -webkit-background-size: 100%;
       -moz-background-size: 100%;
       -o-background-size: 100%;
