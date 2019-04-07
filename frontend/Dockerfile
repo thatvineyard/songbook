@@ -12,7 +12,7 @@ RUN npm install
 # Create environment
 # COPY .dockerenv ./
 #SHELL ["/bin/sh", "-c", ". ./.dockerenv"]
-ENV CONTEXT_ROOT /songbook/app
+# ENV CONTEXT_ROOT /songbook/app
 
 # Build app
 COPY . .

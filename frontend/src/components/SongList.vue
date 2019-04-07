@@ -37,7 +37,7 @@ export default Vue.extend({
   methods: {
     getSongIndex() {
       return axios
-        .get('http://localhost:8888/v1/songs/index')
+        .get(`${this.$rootApi}/v1/songs/index`)
         .then(response => response.data);
     },
   },

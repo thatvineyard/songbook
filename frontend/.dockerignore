@@ -2,5 +2,5 @@
 Dockerfile
 .git
 node_modules
-.env
+# .env
 dist
