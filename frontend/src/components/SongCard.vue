@@ -3,25 +3,42 @@
     <div class="container">
       <div v-if='song'>
         <div class="top">
-          <div class="edit">
-            <p id="edit-symbol">🖊</p>
-          </div>
           <div class="title">
             <h2>{{song.title}}</h2>
           </div>
-          <div class="clear">
-            <!-- -->
+          <div class="edit">
+            <p>◥</p>
           </div>
         </div>
-        <p class="melody">Mel. {{song.melody}}</p>
-        <p class="artist">Tex. {{song.artist}}</p>
-        <p> lyrics </p>
+        <div class="bottom">
+          <div id="info">
+            <div class="melody">
+              <h3>Mel.</h3>
+              {{song.melody}}
+            </div>
+            <div class="artist">
+              <h3>Tex.</h3>
+              Tex. {{song.artist}}
+            </div>
+          </div>
+          <div id='lyrics'>
+            <div class='stansa'>
+              <h4>Verse</h4>
+              <p> lyrics are lyrics </p>
+              <p> lyrics do a lot aof lyrics </p>
+              <p> lyrics and a more more lyric please </p>
+              <p> i want it lyrics </p>
+            </div>
+          </div>
+        </div>
       </div>
       <div v-else>
         <h2>Pending</h2>
         <p>Pending</p>
         <p>Pending</p>
         <p>Pending</p>
+      </div>
+      <div class="fade">
       </div>
     </div>
   </div>
@@ -67,76 +84,76 @@ export default Vue.extend({
 .wrapper {
   width: 80%;
   // height: 500px;
-  background: rgb(209, 207, 193);
   margin: auto;
-  margin-top: 2%;
+  margin-top: 1%;
   position: relative;
   overflow: hidden;
-  border-radius: 10px 10px 10px 10px;
-  border-color: #00394b;
-  border-width: 5px;
-  box-shadow: 0;
+  border-radius: 10px 10px 0px 0px;
+  // border-color: rgba(100, 103, 122, 0.424);
+  // border-width: 4px;
+  // border-style: solid;
+  box-shadow: 0px -30px 20px rgba(89, 92, 98, 0.1);
   transform: scale(0.98);
-  transition: box-shadow 0.5s, transform 0.5s;
+  transition: box-shadow 0.2s, transform 0.2s;
   &:hover {
-    transform: scale(1);
-    box-shadow: 5px 20px 30px rgba(254, 255, 242, 0.2);
+    transform: scale(1) translate(0, -30px);
+    box-shadow: 0px -30px 30px rgba(89, 92, 98, 0.5);
   }
 
   .container {
     width: 100%;
     height: 100%;
+
     .top {
-      height: 100%;
+      height: 30%;
+      min-height: 5em;
       width: 100%;
-      padding-top: 1px;
-      padding-bottom: 1px;
-      padding-left: 10px;
-      padding-right: 10px;
-      background: rgb(71, 69, 65);
-      -webkit-background-size: 100%;
-      -moz-background-size: 100%;
-      -o-background-size: 100%;
-      background-size: 100%;
+      box-shadow: 0px 0px 50px rgba(89, 92, 98, 0.5);
+
+      background: rgb(58, 60, 82);
       color: white;
-      overflow: hidden;
+      // overflow: hidden;
+      display: inline-flex;
 
       .title {
-        width: 70%;
-        height: 100%;
-        float: left;
-        // padding-bottom: 500em;
-        // margin-bottom: -500em;
+        display: block;
+        text-align: left;
+
+        padding-left: 10px;
+        width: 80%;
       }
       .edit {
-        border-radius: 0 0 0 10px;
-        height: 100%;
-        width: 4em;
-        min-width: 50px;
-        float: right;
+        text-align: right;
+        // width: 4em;
+        margin-left: auto;
+        margin-right: 8px;
+        // margin-bottom: auto;
 
-        background: rgb(92, 92, 92);
-        color: rgb(156, 156, 156);
+        color: rgb(250, 250, 250);
         text-align: center;
         transition: 0.5s;
-        #edit-symbol {
-          margin: 2%;
-          width: 100%;
-          font-size: 2em;
+        font-size: 1.8em;
+        & p {
+          margin-top: 0;
+          margin-right: 0;
+          font-weight: bold;
         }
+
         &:hover {
-          background: #1f1f1f;
+          text-shadow: 0px 0px 50px rgba(255, 255, 255, 0.4);
           color: #ffffff;
         }
       }
     }
     .bottom {
-      width: 200%;
-      height: 20%;
+      background: rgb(255, 255, 255);
+      padding-left: 2%;
+      padding-right: 2%;
+      padding-top: 10px;
+      padding-bottom: 2px;
+      width: 96%;
       transition: transform 0.5s;
-      &.clicked {
-        transform: translateX(-50%);
-      }
+
       h1 {
         margin: 0;
         padding: 0;
@@ -145,146 +162,51 @@ export default Vue.extend({
         margin: 0;
         padding: 0;
       }
-      .left {
-        height: 100%;
-        width: 50%;
-        background: #f4f4f4;
-        position: relative;
-        float: left;
-        .details {
-          padding: 20px;
-          float: left;
-          width: calc(70% - 40px);
-        }
-        .buy {
-          float: right;
-          width: calc(30% - 2px);
-          height: 100%;
-          background: #f1f1f1;
-          transition: background 0.5s;
-          border-left: solid thin rgba(0, 0, 0, 0.1);
-          i {
-            font-size: 30px;
-            padding: 30px;
-            color: #254053;
-            transition: transform 0.5s;
-          }
-          &:hover {
-            background: #a6cdde;
-          }
-          &:hover i {
-            transform: translateY(5px);
-            color: #00394b;
-          }
-        }
-      }
-      .right {
-        width: 50%;
-        background: #a6cdde;
-        color: white;
-        float: right;
-        height: 200%;
-        overflow: hidden;
-        .details {
-          padding: 20px;
-          float: right;
-          width: calc(70% - 40px);
-        }
-        .done {
-          width: calc(30% - 2px);
-          float: left;
-          transition: transform 0.5s;
-          border-right: solid thin rgba(255, 255, 255, 0.3);
-          height: 50%;
-          i {
-            font-size: 30px;
-            padding: 30px;
-            color: white;
-          }
-        }
-        .remove {
-          width: calc(30% - 1px);
-          clear: both;
-          border-right: solid thin rgba(255, 255, 255, 0.3);
-          height: 50%;
-          background: #bc3b59;
-          transition: transform 0.5s, background 0.5s;
-          &:hover {
-            background: #9b2847;
-          }
-          &:hover i {
-            transform: translateY(5px);
-          }
-          i {
-            transition: transform 0.5s;
-            font-size: 30px;
-            padding: 30px;
-            color: white;
-          }
-        }
-        &:hover {
-          .remove,
-          .done {
-            transform: translateY(-100%);
-          }
-        }
-      }
-    }
-  }
 
-  .inside {
-    z-index: 9;
-    background: #92879b;
-    width: 140px;
-    height: 140px;
-    position: absolute;
-    top: -70px;
-    right: -70px;
-    border-radius: 0px 0px 200px 200px;
-    transition: all 0.5s, border-radius 2s, top 1s;
-    overflow: hidden;
-    .icon {
-      position: absolute;
-      right: 85px;
-      top: 85px;
-      color: white;
-      opacity: 1;
+      & #info {
+        padding-left: 10%;
+        padding-right: 10%;
+        padding-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        & div {
+          & h3 {
+            margin-bottom: 0;
+          }
+          min-width: 200px;
+          width: 30%;
+          text-align: center;
+          margin: auto;
+        }
+      }
+      & #lyrics {
+        font-size: 0.8em;
+        text-align: center;
+
+        & .stansa {
+          & h4 {
+            color: lightgray;
+            padding-left: 10%;
+            text-align: left;
+            font-size: 0.8em;
+            margin: 0;
+            font-style: italic;
+            font-weight: normal;
+          }
+          margin-top: 10px;
+          margin-bottom: 2px;
+        }
+      }
     }
-    &:hover {
-      width: 100%;
-      right: 0;
-      top: 0;
-      border-radius: 0;
-      height: 80%;
-      .icon {
-        opacity: 0;
-        right: 15px;
-        top: 15px;
-      }
-      .contents {
-        opacity: 1;
-        transform: scale(1);
-        transform: translateY(0);
-      }
-    }
-    .contents {
-      padding: 5%;
-      opacity: 0;
-      transform: scale(0.5);
-      transform: translateY(-200%);
-      transition: opacity 0.2s, transform 0.8s;
-      table {
-        text-align: left;
-        width: 100%;
-      }
-      h1,
-      p,
-      table {
-        color: white;
-      }
-      p {
-        font-size: 13px;
-      }
+
+    .fade {
+      box-shadow: 0px 0px 0px rgba(89, 92, 98, 0);
+      height: 50px;
+      background-image: linear-gradient(
+        to bottom,
+        rgb(255, 255, 255),
+        rgba(255, 255, 255, 0)
+      );
     }
   }
 }
