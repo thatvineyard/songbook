@@ -27,19 +27,17 @@
           </div>
           <div id='lyrics'>
             <div id="lyrics-fog"></div>
-            <div class='stanza'>
-              <h4 class='lyrics-teaser'>Verse</h4>
-              <p class='lyrics-teaser'> lyrics are lyrics </p>
-              <p class='lyrics-teaser'> lyrics do a lot aof lyrics </p>
-              <p class='lyrics-teaser'> lyrics and a more more lyric please </p>
-              <p class='lyrics-preview'> i want it lyrics </p>
-            </div>
-            <div class='stanza'>
-              <h4 class='lyrics-preview'>Verse</h4>
-              <p class='lyrics-preview'> more lyrics are lyrics </p>
-              <p class='lyrics-preview'> more lyrics do a lot aof lyrics </p>
-              <p class='lyrics-preview'> more lyrics and a more more lyric please </p>
-              <p class='lyrics-preview'> more i want it lyrics </p>
+            <div
+              class='stanza'
+              v-for='stanza in song.stanzas'
+              :key='stanza'
+            >
+              <h4 class='lyrics-teaser'>{{stanza.type}}</h4>
+              <p
+                class='lyrics-teaser'
+                v-for='line in stanza.lines'
+                :key='line'
+              > {{line}} </p>
             </div>
           </div>
         </div>
@@ -215,7 +213,7 @@ export default Vue.extend({
       }
       & #lyrics {
         font-size: 1em;
-        text-align: center;
+        text-align: left;
         max-height: 200px;
         padding-bottom: 20px;
 
@@ -255,6 +253,10 @@ export default Vue.extend({
             margin: 0;
             font-style: italic;
             font-weight: bold;
+          }
+          & p {
+            text-align: left;
+            padding-left: 20%;
           }
           margin-top: 10px;
           margin-bottom: 2px;
