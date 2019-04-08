@@ -16,6 +16,7 @@ RUN npm install
 
 # Build app
 COPY . .
+# COPY .env.staging .env.production
 RUN  npm run build
 
 #--------------------------------------------------------------#

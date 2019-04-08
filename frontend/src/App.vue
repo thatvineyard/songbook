@@ -55,8 +55,8 @@ export default {
 body {
   margin: 0;
   padding: 0;
-  background: #e1e1e6;
-  color: #cdcdcd;
+  background: $background;
+  // color: #cdcdcd;
   font-family: "Times", "Avenir", sans-serif;
 }
 
@@ -74,10 +74,15 @@ h2 {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: left;
-  color: #2c3e50;
   margin-top: 60px;
 }
 
 #content {
+  max-width: $content-max-width;
+  margin: auto;
+  @media screen and (max-width: $break-small-horiz),
+    (max-height: $break-small-vert) {
+    font-size: 0.8em;
+  }
 }
 </style>

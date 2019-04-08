@@ -107,7 +107,8 @@ export default {
   &#mobile {
     left: 15px;
     top: 15px;
-    width: 50%;
+    min-width: 200px;
+    width: 40%;
     display: none;
     -webkit-user-select: none;
     user-select: none;
@@ -118,7 +119,7 @@ export default {
       transition: transform 0.5s cubic-bezier(0.77, 0.2, 0.05, 1);
       float: right;
       position: absolute;
-      width: 200px;
+      width: 100%;
       margin: -100px 0 0 -50px;
       padding: 20px;
       padding-top: 80px;
@@ -214,7 +215,8 @@ export default {
   }
 
   // Responsiveness
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: $break-small-horiz),
+    (max-height: $break-small-vert) {
     &#desktop {
       display: none;
     }

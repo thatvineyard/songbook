@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import App from './App.vue';
-import Edit from './Edit.vue';
+// import Edit from './Edit.vue';
 import SongCard from './components/SongCard.vue';
 
 Vue.config.productionTip = false;
@@ -20,7 +20,8 @@ const Bar = { template: '<div>bar</div>' };
 // 3. Create the router
 const router = new VueRouter({
   mode: 'history',
-  base: __dirname,
+  base: process.env.BASE_URL,
+  // base: __dirname,
   routes: [
     { path: '/', component: Home },
     { path: '/edit/:id', component: SongCard, props: { songId: 'song-0' } },
