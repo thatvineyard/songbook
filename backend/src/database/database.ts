@@ -88,8 +88,8 @@ export class Database<T extends object> {
     });
   }
 
-  public post(data: T): string {
-    return this.create(data).getId();
+  public post(data: T): Entry<T> {
+    return this.create(data);
   }
 
   public put(id: string, data: T | null): Entry<T> | null {
@@ -197,7 +197,6 @@ export class Database<T extends object> {
     ) as Entry<T>;
     this.history.push(oldEntry);
     this.enforceRevisionHistoryLimit(oldEntry.getId());
-    console.dir({ removedEntries: this.history }, { depth: null });
   }
 
   public historySize(): number {

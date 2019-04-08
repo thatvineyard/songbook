@@ -6,7 +6,7 @@ import { ApiBuilder } from "./api-framework/api-builder";
 import { Parameter, ParameterType } from "./api-framework/parameter";
 import { create404, create422, create500 } from "./error-handler/errorFactory";
 import { ErrorResponse } from "./error-handler/error-response";
-import { Song } from "models/song";
+import { SongModel } from "../../models/song-model";
 
 export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
 

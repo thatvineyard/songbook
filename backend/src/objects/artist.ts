@@ -9,11 +9,11 @@
 // stanza types: verse, chorus, reference
 
 export class Artist {
+
   firstName: string;
   lastName: string;
 
   constructor(firstName: string, lastName: string) {
-    console.log(" --> Creating Artist");
     this.firstName = firstName;
     this.lastName = lastName;
   }

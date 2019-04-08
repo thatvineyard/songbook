@@ -16,15 +16,11 @@ export class Song {
   melody: string;
   stanzas: Stanza[];
 
-  constructor(title: string, artist: string, melody: string, stanzas: Stanza[]) {
-    console.log(" --> Creating Song");
+  constructor(title: string, artist: string, melody: string, stanzas?: Stanza[]) {
     this.title = title;
     this.artist = artist;
     this.melody = melody;
     this.stanzas = stanzas || [];
-    console.log(stanzas);
-    console.log(this.stanzas);
-    console.log(this);
   }
 
   // function addStanza (type: String, arrayOfLines) {
@@ -35,4 +31,14 @@ export class Song {
   // function getLyrics () {
   //     return arrayOfLines.
   // }
+}
+
+export class Stanza {
+  type: string;
+  lines: string[];
+
+  constructor(type: string, lines: string[]) {
+    this.type = type;
+    this.lines = lines;
+  }
 }

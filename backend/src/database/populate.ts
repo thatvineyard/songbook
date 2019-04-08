@@ -1,19 +1,30 @@
 import { DatabaseHandler } from "./database-handler";
+import { SongDatabaseHandler } from "./song-database-handler";
 import { Database } from "./database";
-import { Song } from "../models/song";
-import { Stanza } from "../models/stanza";
+import { SongModel, StanzaModel } from "../models/song-model";
 import { join } from "path";
 
-export function populateSongs(db: DatabaseHandler, numSongs: number): void {
+export function populateSongs(db: SongDatabaseHandler, numSongs: number, minHistory?: number, maxHistory?: numer): void {
   for (let i = 0; i < numSongs; i++) {
+    maxHistory = maxHistory || 0;
+    minHistory = minHistory || 0;
+    let repetitions = Math.floor(Math.random() * (maxHistory - minHistory + 1) + minHistory);
+
+    // create first song
     let song = generateRandomSong();
-    db.postSong(song.title, song.artist, song.melody);
+    let id = db.post(song).getId();
+
+    // create revisions
+    for (let j = 0; j < repetitions; j++) {
+      let song = generateRandomSong();
+      db.put(id, song);
+    }
   }
 }
 
-export function generateRandomSong(): Song {
+export function generateRandomSong(): SongModel {
   var randomWords = require('random-words');
-  return new Song(
+  return new SongModel(
     capitalizeEveyFirstLetter(randomWords({ min: 1, max: 7 })).join(' '),
     namify(randomWords({ min: 2, max: 3 })),
     capitalizeEveyFirstLetter(randomWords({ min: 2, max: 4 })).join(' '),
@@ -21,15 +32,14 @@ export function generateRandomSong(): Song {
   );
 }
 
-function generateNewStanza(): Stanza {
+function generateNewStanza(): StanzaModel {
   var randomWords = require('random-words');
-  let numLines: number = ((Math.random() * 4 + 2) * 2);
-  console.log(numLines);
-  let lines: String[] = [];
+  let numLines: number = (Math.ceil(Math.random() * 4) + 2) * 2;
+  let lines: string[] = [];
   for (let i = 0; i < numLines; i++) {
     lines.push(randomWords({ min: 5, max: 10 }));
   }
-  return new Stanza("verse", lines);
+  return new StanzaModel("verse", lines);
 }
 
 function capitalizeFirstLetter(string: string): string {

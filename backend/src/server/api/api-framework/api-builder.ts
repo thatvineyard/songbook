@@ -244,10 +244,6 @@ export class ApiBuilder {
   }
 
   private configureRouter(router: Router): void {
-    console.debug(colors.cyan("# API Configuration:"));
-    console.table(this.methods.map(method => method.toString().split(/: | - /)));
-    console.debug();
-    // console.dir(this.methods, { depth: null });
     this.methods.forEach(method => {
       this.addMethodToRouter(router, method);
     });

@@ -1,31 +1,36 @@
-import colors from "colors";
-import { Artist } from "../models/artist";
-import { Melody } from "../models/melody";
-import { Song } from "../models/song";
+import { EntryModel } from "../models/entry-model";
+import { SongModel } from "../models/song-model";
+import { Artist } from "../objects/artist";
+import { Melody } from "../objects/melody";
 import { Database } from './database';
 import { Entry } from "./entry";
-import { populateSongs } from "./populate";
+import { SongDatabaseHandler } from "./song-database-handler";
 
+/**
+ * This class is the main entrypoint for all database actions. 
+ * It is mostly responsible for sending requests to the appropriate database handler 
+ * as well as creating models of the entry that is returned. 
+ * The data in the entry should already be modelled by the individual database handler.
+ * 
+ * 
+ */
 export class DatabaseHandler {
     private static _instance: DatabaseHandler;
 
-    private songDatabase: Database<Song>;
+    private songDatabase: SongDatabaseHandler;
     private melodyDatabase: Database<Melody>;
     private artistDatabase: Database<Artist>;
 
     private constructor() {
-        this.songDatabase = new Database<Song>("song");
-        populateSongs(this, 10);
-        this.songDatabase.logBrief();
-        console.debug();
+        this.songDatabase = SongDatabaseHandler.Instance;
 
         this.melodyDatabase = new Database<Melody>("melody");
-        this.melodyDatabase.logBrief();
+        // this.melodyDatabase.logBrief();
         console.debug();
 
         this.artistDatabase = new Database<Artist>("aritst");
         this.postArtist("Carl", "Wangman");
-        this.artistDatabase.logBrief();
+        // this.artistDatabase.logBrief();
         console.debug();
     }
 
@@ -34,20 +39,17 @@ export class DatabaseHandler {
     }
 
     // SONG
-    public postSong(title: string, artist: string, melody: string): string {
-        let song = new Song(title, artist, melody);
-        return this.songDatabase.post(song);
+    public postSong(songModel: SongModel): EntryModel<SongModel> | null {
+        let result: Entry<SongModel> = this.songDatabase.post(songModel);
+        return this.entryToModel(result);
     }
 
     public putSong(
         id: string,
-        title: string,
-        artist: string,
-        melody: string
-    ): Entry<Song> | null {
-        let song = new Song(title, artist, melody);
-        this.songDatabase.saveRevision(id);
-        return this.songDatabase.put(id, song);
+        songModel: SongModel
+    ): EntryModel<SongModel> | null {
+        let result: Entry<SongModel> = this.songDatabase.put(id, songModel);
+        return this.entryToModel(result);
     }
 
     public patchSong(
@@ -55,28 +57,12 @@ export class DatabaseHandler {
         title?: string,
         artist?: string,
         melody?: string
-    ): Entry<Song> | null {
-        let entry = this.songDatabase.get(id);
-        if (entry) {
-            let song: Song = entry.entryData as Song;
-            this.songDatabase.saveRevision(id);
-            if (title) {
-                song.title = title;
-            }
-            if (artist) {
-                song.artist = artist;
-            }
-            if (melody) {
-                song.melody = melody;
-            }
-            return this.songDatabase.put(id, song);
-        } else {
-            return null;
-        }
+    ): EntryModel<SongModel> | null {
+        let reuslt = this.songDatabase.put(id, title, artist, melody);
+        return this.entryToModel(result);
     }
 
     public deleteSong(id: string) {
-        this.songDatabase.saveRevision(id);
         return this.songDatabase.delete(id);
     }
 
@@ -84,32 +70,43 @@ export class DatabaseHandler {
         return this.songDatabase.has(id);
     }
 
-    public getSong(id: string): Entry<Song> | null {
-        return this.songDatabase.get(id);
+    public getSong(id: string): EntryModel<SongModel> | null {
+        let result: Entry<Song> = this.songDatabase.get(id) as Entry<Song>;
+        return this.entryToModel(result);
     }
 
-    public getSongs() {
-        return this.songDatabase.getAll();
+    public getSongs(): EntryModel<SongModel>[] | null {
+        let result = this.songDatabase.getAll();
+        return result.map((entry: Entry<Song>) => {
+            return this.entryToModel(entry);
+        });
     }
 
     public getSongsIndex() {
         return this.songDatabase.getIndex();
     }
 
-    public recoverSongRevision(id: string, revision: number) {
+    public recoverSongRevision(id: string, revision: number): EntryModel<SongModel> | null {
         return this.songDatabase.recoverRevision(id, revision);
     }
 
-    public dropSongRevision(id: string, revision: number) {
+    public dropSongRevision(id: string, revision: number): void {
         return this.songDatabase.dropRevision(id, revision);
     }
 
-    public recoverAllSongRevisions(id: string) {
-        return this.songDatabase.recoverAllRevisions(id);
+    public recoverAllSongRevisions(id: string): EntryModel<SongModel>[] | null {
+        let result = this.songDatabase.recoverAllRevisions(id);
+        return result.map((entry: Entry<Song>) => {
+            return this.entryToModel(entry);
+        });
     }
 
     public purgeSong(id: string) {
         return this.songDatabase.purge(id);
+    }
+
+    private entryToModel<T extends Object>(entry: Entry<T>): EntryModel<T> {
+        return new EntryModel<T>(entry.getId(), entry.type, entry.revision, entry.created, entry.lastModified, entry.entryData);
     }
 
     // ARTIST
