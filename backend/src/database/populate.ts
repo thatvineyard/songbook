@@ -3,8 +3,9 @@ import { SongDatabaseHandler } from "./song-database-handler";
 import { Database } from "./database";
 import { SongModel, StanzaModel } from "../models/song-model";
 import { join } from "path";
+import { Entry } from "./entry";
 
-export function populateSongs(db: SongDatabaseHandler, numSongs: number, minHistory?: number, maxHistory?: numer): void {
+export function populateSongs(db: SongDatabaseHandler, numSongs: number, minHistory?: number, maxHistory?: number): void {
   for (let i = 0; i < numSongs; i++) {
     maxHistory = maxHistory || 0;
     minHistory = minHistory || 0;
@@ -12,12 +13,15 @@ export function populateSongs(db: SongDatabaseHandler, numSongs: number, minHist
 
     // create first song
     let song = generateRandomSong();
-    let id = db.post(song).getId();
+    let result: Entry<SongModel> | null = db.post(song);
 
-    // create revisions
-    for (let j = 0; j < repetitions; j++) {
-      let song = generateRandomSong();
-      db.put(id, song);
+    if (result) {
+      let id: string = result.getId();
+      // create revisions
+      for (let j = 0; j < repetitions; j++) {
+        let song = generateRandomSong();
+        db.put(id, song);
+      }
     }
   }
 }

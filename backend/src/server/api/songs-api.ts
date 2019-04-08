@@ -108,11 +108,13 @@ function postSong(req: Request, res: Response): void {
   let artist = req.body.artist;
   let melody = req.body.melody;
 
+  let song = new SongModel(title, artist, melody);
+
   // Prepare database
   let db = DatabaseHandler.Instance;
 
   // Do
-  let id = db.postSong(title, artist, melody);
+  let id = db.postSong(song);
 
   if (!id) {
     create500("Posting returned no id, may not have been succesfull");
@@ -145,6 +147,8 @@ function putSong(req: Request, res: Response): void {
   let artist = req.body.artist;
   let melody = req.body.melody;
 
+  let song = new SongModel(title, artist, melody);
+
   // Prepare database
   let db = DatabaseHandler.Instance;
 
@@ -155,7 +159,7 @@ function putSong(req: Request, res: Response): void {
   }
 
   // Do
-  let result = db.putSong(id, title, artist, melody);
+  let result = db.putSong(id, song);
 
   // Validate result
   if (!result) {

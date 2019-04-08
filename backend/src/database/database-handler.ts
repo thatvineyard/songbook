@@ -40,7 +40,7 @@ export class DatabaseHandler {
 
     // SONG
     public postSong(songModel: SongModel): EntryModel<SongModel> | null {
-        let result: Entry<SongModel> = this.songDatabase.post(songModel);
+        let result: Entry<SongModel> | null = this.songDatabase.post(songModel);
         return this.entryToModel(result);
     }
 
@@ -48,7 +48,7 @@ export class DatabaseHandler {
         id: string,
         songModel: SongModel
     ): EntryModel<SongModel> | null {
-        let result: Entry<SongModel> = this.songDatabase.put(id, songModel);
+        let result: Entry<SongModel> | null = this.songDatabase.put(id, songModel);
         return this.entryToModel(result);
     }
 
@@ -58,7 +58,7 @@ export class DatabaseHandler {
         artist?: string,
         melody?: string
     ): EntryModel<SongModel> | null {
-        let reuslt = this.songDatabase.put(id, title, artist, melody);
+        let result: Entry<SongModel> | null = this.songDatabase.patch(id, title, artist, melody);
         return this.entryToModel(result);
     }
 
@@ -71,15 +71,19 @@ export class DatabaseHandler {
     }
 
     public getSong(id: string): EntryModel<SongModel> | null {
-        let result: Entry<Song> = this.songDatabase.get(id) as Entry<Song>;
+        let result: Entry<SongModel> | null = this.songDatabase.get(id);
         return this.entryToModel(result);
     }
 
-    public getSongs(): EntryModel<SongModel>[] | null {
-        let result = this.songDatabase.getAll();
-        return result.map((entry: Entry<Song>) => {
-            return this.entryToModel(entry);
-        });
+    public getSongs(): EntryModel<SongModel>[] {
+        let result: Entry<SongModel>[] = this.songDatabase.getAll();
+        return result.reduce((results, entry: Entry<SongModel>) => {
+            let result = this.entryToModel(entry);
+            if (result) {
+                results.push(result);
+            }
+            return results;
+        }, [] as EntryModel<SongModel>[]);
     }
 
     public getSongsIndex() {
@@ -87,26 +91,36 @@ export class DatabaseHandler {
     }
 
     public recoverSongRevision(id: string, revision: number): EntryModel<SongModel> | null {
-        return this.songDatabase.recoverRevision(id, revision);
+        let result = this.songDatabase.recoverRevision(id, revision);
+        return this.entryToModel(result);
+
     }
 
     public dropSongRevision(id: string, revision: number): void {
         return this.songDatabase.dropRevision(id, revision);
     }
 
-    public recoverAllSongRevisions(id: string): EntryModel<SongModel>[] | null {
-        let result = this.songDatabase.recoverAllRevisions(id);
-        return result.map((entry: Entry<Song>) => {
-            return this.entryToModel(entry);
-        });
+    public recoverAllSongRevisions(id: string): EntryModel<SongModel>[] {
+        let result: Entry<SongModel>[] = this.songDatabase.recoverAllRevisions(id);
+        return result.reduce((results, entry: Entry<SongModel>) => {
+            let result = this.entryToModel(entry);
+            if (result) {
+                results.push(result);
+            }
+            return results;
+        }, [] as EntryModel<SongModel>[]);
     }
 
     public purgeSong(id: string) {
         return this.songDatabase.purge(id);
     }
 
-    private entryToModel<T extends Object>(entry: Entry<T>): EntryModel<T> {
-        return new EntryModel<T>(entry.getId(), entry.type, entry.revision, entry.created, entry.lastModified, entry.entryData);
+    private entryToModel<T extends Object>(entry: Entry<T> | null): EntryModel<T> | null {
+        if (entry) {
+            return new EntryModel<T>(entry.getId(), entry.type, entry.revision, entry.created, entry.lastModified, entry.entryData);
+        } else {
+            return null;
+        }
     }
 
     // ARTIST

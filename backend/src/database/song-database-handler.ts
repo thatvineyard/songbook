@@ -1,7 +1,8 @@
 import { populateSongs } from "./populate";
 import { Database } from './database';
-import { Song } from "../objects/song";
-import { SongModel } from "../models/song-model";
+import { Song, Stanza } from "../objects/song";
+import { SongModel, StanzaModel } from "../models/song-model";
+import { Entry } from "./entry";
 
 export class SongDatabaseHandler {
   private static _instance: SongDatabaseHandler;
@@ -20,10 +21,14 @@ export class SongDatabaseHandler {
 
   // SONG
   public post(songModel: SongModel): Entry<SongModel> | null {
-    let song = new Song(songModel.title, songModel.artist, songModel.melody, songModel.stanzas);
+    let stanzas: Stanza[] = songModel.stanzas.reduce((results: Stanza[], stanzaModel: StanzaModel) => {
+      results.push(new Stanza(stanzaModel.type, stanzaModel.lines));
+      return results;
+    }, [] as Stanza[]);
+    let song = new Song(songModel.title, songModel.artist, songModel.melody, stanzas);
 
     // do
-    let result: Entry<Song> = this.songDatabase.post(song);
+    let result: Entry<Song> | null = this.songDatabase.post(song);
 
     // convert to model
     return this.songToModelInEntry(result);
@@ -39,15 +44,14 @@ export class SongDatabaseHandler {
       let song = new Song(songModel.title, songModel.artist, songModel.melody, songModel.stanzas);
 
       // do
-      let result: Entry<Song> = this.songDatabase.put(id, song);
+      let result: Entry<Song> | null = this.songDatabase.put(id, song);
 
       // convert to model
       if (result) {
         return this.songToModelInEntry(result);
-      } else {
-        return null;
       }
     }
+    return null;
   }
 
   public patch(
@@ -70,12 +74,13 @@ export class SongDatabaseHandler {
         if (melody) {
           song.melody = melody;
         }
-        let result: Entry<Song> = this.songDatabase.put(id, song);
-        return this.songToModelInEntry(result);
-      } else {
-        return null;
+        let result: Entry<Song> | null = this.songDatabase.put(id, song);
+        if (result) {
+          return this.songToModelInEntry(result);
+        }
       }
     }
+    return null;
   }
 
   public delete(id: string): Entry<SongModel> | null {
@@ -84,10 +89,9 @@ export class SongDatabaseHandler {
       let result = this.songDatabase.delete(id);
       if (result) {
         return this.songToModelInEntry(result);
-      } else {
-        return null;
       }
     }
+    return null;
   }
 
   public has(id: string): boolean {
@@ -101,7 +105,7 @@ export class SongDatabaseHandler {
     return this.songToModelInEntry(result);
   }
 
-  public getAll(): Entry<SongModel> {
+  public getAll(): Entry<SongModel>[] {
     let result: Entry<Song>[] = this.songDatabase.getAll();
 
     return result.map((entry: Entry<Song>) => {
@@ -127,25 +131,29 @@ export class SongDatabaseHandler {
     return this.songDatabase.dropRevision(id, revision);
   }
 
-  public recoverAllRevisions(id: string): Entry<SongModel>[] | null {
+  public recoverAllRevisions(id: string): Entry<SongModel>[] {
     let result = this.songDatabase.recoverAllRevisions(id);
-
 
     return result.map((entry: Entry<Song>) => {
       return this.songToModelInEntry(entry);
     });
+
   }
 
   public purge(id: string): void {
     return this.songDatabase.purge(id);
   }
 
-  private songToModel(song: Song): SongModel {
-    return new SongModel(song.title, song.artist, song.melody, song.stanzas);
+  private songToModel(song: Song | null): SongModel | null {
+    if (song) {
+      return new SongModel(song.title, song.artist, song.melody, song.stanzas);
+    } else {
+      return null;
+    }
   }
 
   private songToModelInEntry(entry: Entry<Song>): Entry<SongModel> {
     entry.entryData = this.songToModel(entry.entryData);
-    return entry;
+    return entry as Entry<SongModel>;
   }
 }

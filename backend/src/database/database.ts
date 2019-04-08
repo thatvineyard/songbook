@@ -161,7 +161,7 @@ export class Database<T extends object> {
     return result[0] || null;
   }
 
-  public recoverAllRevisions(id: string): Entry<T>[] | null {
+  public recoverAllRevisions(id: string): Entry<T>[] {
     let result = this.history.filter((entry: Entry<T>) => {
       if (entry.getId() === id) {
         return true;
