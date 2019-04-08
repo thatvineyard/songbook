@@ -54,8 +54,10 @@ function generateNewStanza(): StanzaModel {
     case 0:
     default:
       stanzaType = "verse";
+      break;
     case 1:
       stanzaType = "chorus";
+      break;
   }
 
   var randomWords = require('random-words');
