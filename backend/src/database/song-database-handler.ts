@@ -99,10 +99,12 @@ export class SongDatabaseHandler {
   }
 
   public get(id: string): Entry<SongModel> | null {
-    let result: Entry<Song> = this.songDatabase.get(id) as Entry<Song>;
+    let result: Entry<Song> | null = this.songDatabase.get(id) as Entry<Song>;
 
     // convert to model
-    return this.songToModelInEntry(result);
+    if (result) {
+      return this.songToModelInEntry(result);
+    }
   }
 
   public getAll(): Entry<SongModel>[] {
