@@ -32,18 +32,39 @@ export function generateRandomSong(): SongModel {
     capitalizeEveyFirstLetter(randomWords({ min: 1, max: 7 })).join(' '),
     namify(randomWords({ min: 2, max: 3 })),
     capitalizeEveyFirstLetter(randomWords({ min: 2, max: 4 })).join(' '),
-    [generateNewStanza()]
+    generateStanzas()
   );
 }
 
+function generateStanzas(): StanzaModel[] {
+  let result: StanzaModel[] = [];
+
+  let repetitions = Math.floor(Math.random() * (10 - 2 + 1) + 2);
+  for (let i = 0; i < repetitions; i++) {
+    result.push(generateNewStanza());
+  }
+  return result;
+}
+
 function generateNewStanza(): StanzaModel {
+
+  let stanzaTypeSelector: number = Math.floor(Math.random() * (2 - 0 + 1) + 0);
+  let stanzaType: string;
+  switch (stanzaTypeSelector) {
+    case 0:
+    default:
+      stanzaType = "verse";
+    case 1:
+      stanzaType = "chorus";
+  }
+
   var randomWords = require('random-words');
   let numLines: number = (Math.ceil(Math.random() * 4) + 2) * 2;
   let lines: string[] = [];
   for (let i = 0; i < numLines; i++) {
     lines.push(randomWords({ min: 5, max: 10, join: ' ' }));
   }
-  return new StanzaModel("verse", lines);
+  return new StanzaModel(stanzaType, lines);
 }
 
 function capitalizeFirstLetter(string: string): string {
