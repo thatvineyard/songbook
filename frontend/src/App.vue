@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <NavBar v-bind:links="links" />
-    <SongList />
+    <div id="content">
+      <SongList />
+    </div>
   </div>
 </template>
 
@@ -15,9 +17,7 @@ export default {
     SongList,
     NavBar,
   },
-  mounted() {
-    console.log(process.env.VUE_APP_ROOT_API);
-  },
+  mounted() {},
   data() {
     return {
       links: {
@@ -76,5 +76,8 @@ h2 {
   text-align: left;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+#content {
 }
 </style>

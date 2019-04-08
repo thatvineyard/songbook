@@ -15,7 +15,8 @@
     "core-js": "^2.6.5",
     "ts-loader": "^5.3.3",
     "typescript": "^3.4.2",
-    "vue": "^2.6.6"
+    "vue": "^2.6.6",
+    "vue-router": "^3.0.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.5.0",

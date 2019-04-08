@@ -46,6 +46,7 @@ export default Vue.extend({
 
 <style scoped>
 .song-list {
+  padding-top: 20px;
   padding-left: 10px;
   padding-right: 10px;
   margin: auto;

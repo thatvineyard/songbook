@@ -1,5 +1,6 @@
 <template>
   <div class="card wrapper">
+    <input type="checkbox" />
     <div class="container">
       <div v-if='song'>
         <div class="top">
@@ -7,10 +8,14 @@
             <h2>{{song.title}}</h2>
           </div>
           <div class="edit">
-            <!-- <p>◥</p> -->
+            <a href='edit/song.id' />
+            <!--
+              <p
+            >◥</p> -->
           </div>
         </div>
         <div class="bottom">
+          <div id="fog"></div>
           <div id="info">
             <div class="melody">
               <h3>Melody:</h3>
@@ -26,7 +31,6 @@
             </div>
           </div>
           <div id='lyrics'>
-            <div id="lyrics-fog"></div>
             <div
               class='stanza'
               v-for='stanza in song.stanzas'
@@ -104,7 +108,7 @@ export default Vue.extend({
   // border-style: solid;
   box-shadow: 0px -30px 20px rgba(89, 92, 98, 0.1);
   transform: scale(0.98);
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: 0.5s;
   &:hover {
     transform: scale(1) translate(0, -30px);
     box-shadow: 0px -30px 30px rgba(89, 92, 98, 0.5);
@@ -114,14 +118,39 @@ export default Vue.extend({
       font-size: unset;
       // transition: 0.3s linear 0s;
     }
-    & .container div .bottom #lyrics #lyrics-fog {
+    & .container {
+      // opacity: 0;
+      // transform: ;
+      max-height: 500px;
+    }
+  }
+  & input:checked ~ .container {
+    max-height: 1000px;
+    & #fog {
       opacity: 0;
+    }
+  }
+  & input {
+    opacity: 0;
+    z-index: 10;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    // height: 70%;
+    // height: 200px;
+
+    &:checked {
+      // height: 100%;
     }
   }
 
   .container {
     width: 100%;
     height: 100%;
+    max-height: 300px;
+    transition: 0.5s;
 
     .top {
       height: 30%;
@@ -143,12 +172,16 @@ export default Vue.extend({
       }
       .edit {
         text-align: right;
-        width: 10vh;
-        height: 10vh;
+        top: 0;
+        right: 0;
+        width: 8vmax;
+        height: 8vmax;
+        z-index: 100;
         margin-left: auto;
         margin-right: 0;
+        position: absolute;
         // margin-bottom: auto;
-        background: linear-gradient(45deg, rgb(58, 60, 82) 50%, #8e92c7 50%);
+        background: linear-gradient(45deg, rgba(0, 0, 0, 0) 50%, #8e92c7 50%);
         opacity: 0.5;
         // background: rgb(250, 250, 250);
         text-align: center;
@@ -156,10 +189,12 @@ export default Vue.extend({
 
         // transition: background 0.5s;
         font-size: 1.8em;
-        & p {
-          margin-top: 0;
-          margin-right: 0;
-          font-weight: bold;
+        & a {
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          position: absolute;
         }
 
         &:hover {
@@ -176,9 +211,26 @@ export default Vue.extend({
       padding-top: 10px;
       padding-bottom: 2px;
       width: 96%;
-      transition: transform 0.5s;
-      height: 70%;
+      transition: transform 0.2s;
 
+      & #fog {
+        // height: 200px;
+        width: 100%;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0) 70%,
+          rgba(255, 255, 255, 1) 95% rgba(255, 255, 255, 1) 100%
+        );
+        z-index: 2;
+        transition: 0.2s linear 0s;
+        // transition: 0.3s linear 0.3s;
+      }
       h1 {
         margin: 0;
         padding: 0;
@@ -214,35 +266,11 @@ export default Vue.extend({
       & #lyrics {
         font-size: 1em;
         text-align: left;
-        max-height: 200px;
+        width: 96%;
         padding-bottom: 20px;
-
-        & #lyrics-fog {
-          height: 100%;
-          width: 100%;
-          position: absolute;
-          top: 50px;
-          bottom: 0;
-          left: 0;
-          background: linear-gradient(
-            to bottom,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0) 20%,
-            rgba(255, 255, 255, 1) 70%,
-            #e1e1e6 80% #e1e1e6 90%
-          );
-          z-index: 2;
-          transition: 0.3s linear 0.3s;
-        }
-
-        & .lyrics-teaser {
-          // display: none;
-        }
-        & .lyrics-preview {
-          opacity: 0;
-          font-size: 0;
-          transition: font-size 0.3s linear 0s, opacity 0.3s linear 0.3s;
-        }
+        position: relative;
+        overflow: hidden;
+        text-overflow: clip;
 
         & .stanza {
           & h4 {
@@ -266,12 +294,12 @@ export default Vue.extend({
 
     .fade {
       box-shadow: 0px 0px 0px rgba(89, 92, 98, 0);
+      position: absolute;
+      width: 100%;
+      bottom: 0;
       height: 20px;
-      background-image: linear-gradient(
-        to bottom,
-        rgb(255, 255, 255),
-        rgba(255, 255, 255, 0)
-      );
+      z-index: 100;
+      background-image: linear-gradient(to bottom, rgb(255, 255, 255), #e1e1e6);
     }
   }
 }
