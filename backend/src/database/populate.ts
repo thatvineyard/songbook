@@ -41,7 +41,7 @@ function generateNewStanza(): StanzaModel {
   let numLines: number = (Math.ceil(Math.random() * 4) + 2) * 2;
   let lines: string[] = [];
   for (let i = 0; i < numLines; i++) {
-    lines.push(randomWords({ min: 5, max: 10 }));
+    lines.push(randomWords({ min: 5, max: 10, join: ' ' }));
   }
   return new StanzaModel("verse", lines);
 }
