@@ -104,6 +104,8 @@ export class SongDatabaseHandler {
     // convert to model
     if (result) {
       return this.songToModelInEntry(result);
+    } else {
+      return null;
     }
   }
 
