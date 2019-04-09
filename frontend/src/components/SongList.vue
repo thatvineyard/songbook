@@ -3,8 +3,8 @@
     class="song-list"
     v-if="songs"
   >
-    <TopButtons v-bind:settings="[{name: 'Preview'}, {name: 'Setting #2'}, {name: 'Setting #3'}]" />
-    <SongCard
+    <TopButtonsVue v-bind:settings="[{name: 'Preview'}, {name: 'Setting #2'}, {name: 'Setting #3'}]" />
+    <SongCardVue
       v-for="songId in songs"
       :key="songId"
       v-bind:songId='songId'
@@ -14,16 +14,17 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import vue from 'vue';
 import axios from 'axios';
-import SongCard from './SongCard.vue';
-import TopButtons from './layout/TopButtons.vue';
+import urlJoin from 'url-join';
+import SongCardVue from './SongCard.vue';
+import TopButtonsVue from './layout/TopButtons.vue';
 
-export default Vue.extend({
+export default {
   name: 'song-list',
   components: {
-    SongCard,
-    TopButtons,
+    SongCardVue,
+    TopButtonsVue,
   },
 
   data() {
@@ -40,12 +41,12 @@ export default Vue.extend({
 
   methods: {
     getSongIndex() {
-      return axios
-        .get(`${this.$rootApi}/v1/songs/index`)
-        .then(response => response.data);
+      return axios.get(urlJoin(this.$rootApi, '/v1/songs/index')).then(
+        response => response.data,
+      );
     },
   },
-});
+};
 </script>
 
 <style scoped>

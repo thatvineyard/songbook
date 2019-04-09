@@ -51,10 +51,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import vue from 'vue';
 import axios from 'axios';
+import urlJoin from 'url-join';
 
-export default Vue.extend({
+export default {
   name: 'song-card',
   props: { songId: String, preview: String },
   data() {
@@ -69,12 +70,12 @@ export default Vue.extend({
   },
   methods: {
     getSongInfo(id) {
-      return axios
-        .get(`${this.$rootApi}/v1/songs/collection/${id}`)
-        .then(response => response.data);
+      return axios.get(
+        urlJoin(this.$rootApi, `/v1/songs/collection/${id}`),
+      ).then(response => response.data);
     },
   },
-});
+};
 </script>
 
 <style lang="scss" scoped>
