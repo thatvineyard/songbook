@@ -51,7 +51,6 @@
 </template>
 
 <script lang="ts">
-import vue from 'vue';
 import axios from 'axios';
 import urlJoin from 'url-join';
 
@@ -70,9 +69,9 @@ export default {
   },
   methods: {
     getSongInfo(id) {
-      return axios.get(
-        urlJoin(this.$rootApi, `/v1/songs/collection/${id}`),
-      ).then(response => response.data);
+      return axios
+        .get(urlJoin(this.$rootApi, `/v1/songs/collection/${id}`))
+        .then(response => response.data);
     },
   },
 };

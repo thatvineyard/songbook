@@ -3,7 +3,10 @@
     class="song-list"
     v-if="songs"
   >
-    <TopButtonsVue v-bind:settings="[{name: 'Preview'}, {name: 'Setting #2'}, {name: 'Setting #3'}]" />
+    <DashboardVue v-bind:settings="[
+    {name: 'Preview'}, {name: 'Animation'}, {name: 'Setting #3'}
+    ]" />
+    <LineBreakVue v-bind:margin="'40px'" />
     <SongCardVue
       v-for="songId in songs"
       :key="songId"
@@ -14,17 +17,19 @@
 </template>
 
 <script lang="ts">
-import vue from 'vue';
+// import vue from 'vue';
 import axios from 'axios';
 import urlJoin from 'url-join';
 import SongCardVue from './SongCard.vue';
-import TopButtonsVue from './layout/TopButtons.vue';
+import DashboardVue from './layout/Dashboard.vue';
+import LineBreakVue from './layout/LineBreak.vue';
 
 export default {
   name: 'song-list',
   components: {
     SongCardVue,
-    TopButtonsVue,
+    DashboardVue,
+    LineBreakVue,
   },
 
   data() {
@@ -41,15 +46,15 @@ export default {
 
   methods: {
     getSongIndex() {
-      return axios.get(urlJoin(this.$rootApi, '/v1/songs/index')).then(
-        response => response.data,
-      );
+      return axios
+        .get(urlJoin(this.$rootApi, '/v1/songs/index'))
+        .then(response => response.data);
     },
   },
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .song-list {
   padding-top: 20px;
   width: 80%;
