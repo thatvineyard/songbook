@@ -15,12 +15,16 @@ export class Song {
   artist: string;
   melody: string;
   stanzas: Stanza[];
+  languageCode: string;
+  original: boolean;
 
-  constructor(title: string, artist: string, melody: string, stanzas?: Stanza[]) {
+  constructor(title: string, artist: string, melody: string, stanzas?: Stanza[], languageCode?: string, original: boolean = false) {
     this.title = title;
     this.artist = artist;
     this.melody = melody;
     this.stanzas = stanzas || [];
+    this.languageCode = languageCode || 'en';
+    this.original = original;
   }
 
   // function addStanza (type: String, arrayOfLines) {

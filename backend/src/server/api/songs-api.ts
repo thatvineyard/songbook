@@ -11,30 +11,30 @@ import { SongModel } from "../../models/song-model";
 export let songsApiBuilder: ApiBuilder = new ApiBuilder("");
 
 // common params
-let paramBodyTitleRequired = new Parameter(ParameterType.BODY, "title", "string", true);
-let paramBodyTitleOptional = new Parameter(ParameterType.BODY, "title", "string", false);
+let paramBodyTitleRequired = new Parameter(ParameterType.BODY, "title", "string", "", true);
+let paramBodyTitleOptional = new Parameter(ParameterType.BODY, "title", "string", "", false);
 
-let paramBodyArtistRequired = new Parameter(ParameterType.BODY, "artist", "string", true);
-let paramBodyArtistOptional = new Parameter(ParameterType.BODY, "artist", "string", false);
+let paramBodyWriterRefRequired = new Parameter(ParameterType.BODY, "writerRef", "string", "", true);
+let paramBodyWriterRefOptional = new Parameter(ParameterType.BODY, "writerRef", "string", "", false);
 
-let paramBodyMelodyRequired = new Parameter(ParameterType.BODY, "melody", "string", true);
-let paramBodyMelodyOptional = new Parameter(ParameterType.BODY, "melody", "string", false);
+let paramBodyMelodyRefRequired = new Parameter(ParameterType.BODY, "melodyRef", "string", "", true);
+let paramBodyMelodyRefOptional = new Parameter(ParameterType.BODY, "melodyRef", "string", "", false);
 
-let paramQueryIdRequired = new Parameter(ParameterType.QUERY, "id", "string", true);
-let paramQueryIdOptional = new Parameter(ParameterType.QUERY, "id", "string", false);
-let paramBodyIdRequired = new Parameter(ParameterType.BODY, "id", "string", true);
-let paramBodyIdOptional = new Parameter(ParameterType.BODY, "id", "string", false);
-let paramUrlIdRequired = new Parameter(ParameterType.URL, "id", "string", true);
-let paramUrlIdOptional = new Parameter(ParameterType.URL, "id", "string", false);
+let paramQueryIdRequired = new Parameter(ParameterType.QUERY, "id", "string", "", true);
+let paramQueryIdOptional = new Parameter(ParameterType.QUERY, "id", "string", "", false);
+let paramBodyIdRequired = new Parameter(ParameterType.BODY, "id", "string", "", true);
+let paramBodyIdOptional = new Parameter(ParameterType.BODY, "id", "string", "", false);
+let paramUrlIdRequired = new Parameter(ParameterType.URL, "id", "string", "", true);
+let paramUrlIdOptional = new Parameter(ParameterType.URL, "id", "string", "", false);
 
-let paramUrlRevisionRequired = new Parameter(ParameterType.QUERY, "revision", "integer", true);
-let paramBodyRevisionOptional = new Parameter(ParameterType.QUERY, "revision", "integer", false);
-let paramBodyRefsList = new Parameter(ParameterType.BODY, "refs", "list of strings", false);
+let paramUrlRevisionRequired = new Parameter(ParameterType.QUERY, "revision", "integer", "", true);
+let paramBodyRevisionOptional = new Parameter(ParameterType.QUERY, "revision", "integer", "", false);
+let paramBodyRefsList = new Parameter(ParameterType.BODY, "refs", "list of strings", "", false);
 
 
 //=========================================================================//
 /**
- * GET SONGS
+ * GET SONG
  */
 //=========================================================================//
 
@@ -72,7 +72,7 @@ songsApiBuilder.addGet(serverConstants.collectionUrl + "/:id", getSong, "Get son
 //=========================================================================//
 
 // Function
-function getSongs(req: Request, res: Response): void {
+function getSongCollection(req: Request, res: Response): void {
 
   // Do
   let db = DatabaseHandler.Instance;
@@ -84,15 +84,15 @@ function getSongs(req: Request, res: Response): void {
   }
 
   // Respond
-  res.send(db.getSongs());
+  res.send(result);
 
 }
 
 // PARAMS
-let getSongsParams: Parameter[] = [];
+let getSongCollectionParams: Parameter[] = [];
 
 // API
-songsApiBuilder.addGet(serverConstants.collectionUrl, getSongs, "Get songs", getSongsParams);
+songsApiBuilder.addGet(serverConstants.collectionUrl, getSongCollection, "Get song collection", getSongCollectionParams);
 
 //=========================================================================//
 /**
@@ -105,10 +105,10 @@ function postSong(req: Request, res: Response): void {
 
   // Extract variables
   let title = req.body.title;
-  let artist = req.body.artist;
-  let melody = req.body.melody;
+  let artistRef = req.body.artistRef;
+  let melodyRef = req.body.melodyRef;
 
-  let song = new SongModel(title, artist, melody);
+  let song = new SongModel(title, artistRef, melodyRef);
 
   // Prepare database
   let db = DatabaseHandler.Instance;
@@ -127,7 +127,7 @@ function postSong(req: Request, res: Response): void {
 }
 
 // Params
-let postSongParams: Parameter[] = [paramBodyTitleRequired, paramBodyArtistRequired, paramBodyMelodyRequired];
+let postSongParams: Parameter[] = [paramBodyTitleRequired, paramBodyWriterRefRequired, paramBodyMelodyRefRequired];
 
 // API
 songsApiBuilder.addPost(serverConstants.collectionUrl, postSong, "Post song", postSongParams);
@@ -144,10 +144,10 @@ function putSong(req: Request, res: Response): void {
   // Extracting variables
   let id = req.params.id;
   let title = req.body.title;
-  let artist = req.body.artist;
-  let melody = req.body.melody;
+  let writerRef = req.body.writerRef;
+  let melodyRef = req.body.melodyRef;
 
-  let song = new SongModel(title, artist, melody);
+  let song = new SongModel(title, writerRef, melodyRef);
 
   // Prepare database
   let db = DatabaseHandler.Instance;
@@ -173,7 +173,7 @@ function putSong(req: Request, res: Response): void {
 }
 
 // Params
-let putSongParams: Parameter[] = [paramUrlIdRequired, paramBodyTitleRequired, paramBodyArtistRequired, paramBodyMelodyRequired];
+let putSongParams: Parameter[] = [paramUrlIdRequired, paramBodyTitleRequired, paramBodyWriterRefRequired, paramBodyMelodyRefRequired];
 
 // API
 songsApiBuilder.addPut(serverConstants.collectionUrl + "/:id", putSong, "Put song", putSongParams);
@@ -218,7 +218,7 @@ function patchSong(req: Request, res: Response): void {
 }
 
 // Params
-let patchSongParams: Parameter[] = [paramUrlIdRequired, paramBodyTitleOptional, paramBodyArtistOptional, paramBodyMelodyOptional];
+let patchSongParams: Parameter[] = [paramUrlIdRequired, paramBodyTitleOptional, paramBodyWriterRefOptional, paramBodyMelodyRefOptional];
 
 // API
 songsApiBuilder.addPatch(serverConstants.collectionUrl + "/:id", patchSong, "Patch song", patchSongParams);
@@ -463,7 +463,7 @@ function restoreSongRevision(req: Request, res: Response): void {
 
   if (req.query.id) {
     let id = req.query.id;
-    let result = db.getSong(id);
+    let result = db.getWriter(id);
 
     if (result !== null) {
       res.send(result);

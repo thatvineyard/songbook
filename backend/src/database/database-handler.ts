@@ -1,10 +1,13 @@
 import { EntryModel } from "../models/entry-model";
 import { SongModel } from "../models/song-model";
-import { Artist } from "../objects/artist";
+import { WriterModel } from "../models/writer-model";
+import { Writer } from "../objects/writer";
 import { Melody } from "../objects/melody";
 import { Database } from './database';
 import { Entry } from "./entry";
+import { populate } from "./populate";
 import { SongDatabaseHandler } from "./song-database-handler";
+import { WriterDatabaseHandler } from "./writer-database-handler";
 
 /**
  * This class is the main entrypoint for all database actions. 
@@ -18,20 +21,15 @@ export class DatabaseHandler {
     private static _instance: DatabaseHandler;
 
     private songDatabase: SongDatabaseHandler;
-    private melodyDatabase: Database<Melody>;
-    private artistDatabase: Database<Artist>;
+    // private melodyDatabase: Database<Melody>;
+    private writerDatabase: WriterDatabaseHandler;
 
     private constructor() {
         this.songDatabase = SongDatabaseHandler.Instance;
+        // this.melodyDatabase = MelodyDatabaseHandler.Instance;
+        this.writerDatabase = WriterDatabaseHandler.Instance;
 
-        this.melodyDatabase = new Database<Melody>("melody");
-        // this.melodyDatabase.logBrief();
-        console.debug();
-
-        this.artistDatabase = new Database<Artist>("aritst");
-        this.postArtist("Carl", "Wangman");
-        // this.artistDatabase.logBrief();
-        console.debug();
+        populate(this.songDatabase, this.writerDatabase, 2, 0, 0);
     }
 
     public static get Instance() {
@@ -41,6 +39,7 @@ export class DatabaseHandler {
     // SONG
     public postSong(songModel: SongModel): EntryModel<SongModel> | null {
         let result: Entry<SongModel> | null = this.songDatabase.post(songModel);
+
         return this.entryToModel(result);
     }
 
@@ -55,10 +54,10 @@ export class DatabaseHandler {
     public patchSong(
         id: string,
         title?: string,
-        artist?: string,
+        writer?: string,
         melody?: string
     ): EntryModel<SongModel> | null {
-        let result: Entry<SongModel> | null = this.songDatabase.patch(id, title, artist, melody);
+        let result: Entry<SongModel> | null = this.songDatabase.patch(id, title, writer, melody);
         return this.entryToModel(result);
     }
 
@@ -115,63 +114,72 @@ export class DatabaseHandler {
         return this.songDatabase.purge(id);
     }
 
+    // Writer
+    public postWriter(writerModel: WriterModel): EntryModel<WriterModel> | null {
+        let result: Entry<WriterModel> | null = this.writerDatabase.post(writerModel);
+        return this.entryToModel(result);
+    }
+
+    public putWriter(
+        id: string,
+        writerModel: WriterModel
+    ): EntryModel<WriterModel> | null {
+        let result: Entry<WriterModel> | null = this.writerDatabase.put(id, writerModel);
+        return this.entryToModel(result);
+    }
+
+    public deleteWriter(id: string) {
+        return this.writerDatabase.delete(id);
+    }
+
+    public hasWriter(id: string): boolean {
+        return this.writerDatabase.has(id);
+    }
+
+    public getWriter(id: string): Entry<Writer> | null {
+        return this.writerDatabase.get(id);
+    }
+
+    public getWriters() {
+        return this.writerDatabase.getAll();
+    }
+
+    public getWritersIndex() {
+        return this.writerDatabase.getIndex();
+    }
+
+    // MELODY
+    // public postMelody(title: string) {
+    //     let melody = new Melody(title);
+    //     return this.melodyDatabase.post(melody);
+    // }
+
+    // public deleteMelody(id: string) {
+    //     return this.melodyDatabase.delete(id);
+    // }
+
+    // public hasMelody(id: string): boolean {
+    //     return this.melodyDatabase.has(id);
+    // }
+
+    // public getMelody(id: string): Entry<Melody> | null {
+    //     return this.melodyDatabase.get(id);
+    // }
+
+    // public getMelodies() {
+    //     return this.melodyDatabase.getAll();
+    // }
+
+    // public getMelodiesIndex() {
+    //     return this.melodyDatabase.getIndex();
+    // }
+
+    // UTILS
     private entryToModel<T extends Object>(entry: Entry<T> | null): EntryModel<T> | null {
         if (entry) {
             return new EntryModel<T>(entry.getId(), entry.type, entry.revision, entry.created, entry.lastModified, entry.entryData);
         } else {
             return null;
         }
-    }
-
-    // ARTIST
-    public postArtist(firstName: string, lastName: string) {
-        let artist = new Artist(firstName, lastName);
-        return this.artistDatabase.post(artist);
-    }
-
-    public deleteArtist(id: string) {
-        return this.artistDatabase.delete(id);
-    }
-
-    public hasArtist(id: string): boolean {
-        return this.artistDatabase.has(id);
-    }
-
-    public getArtist(id: string): Entry<Artist> | null {
-        return this.artistDatabase.get(id);
-    }
-
-    public getArtists() {
-        return this.artistDatabase.getAll();
-    }
-
-    public getArtistsIndex() {
-        return this.artistDatabase.getIndex();
-    }
-
-    // MELODY
-    public postMelody(title: string) {
-        let melody = new Melody(title);
-        return this.melodyDatabase.post(melody);
-    }
-
-    public deleteMelody(id: string) {
-        return this.melodyDatabase.delete(id);
-    }
-
-    public hasMelody(id: string): boolean {
-        return this.melodyDatabase.has(id);
-    }
-
-    public getMelody(id: string): Entry<Melody> | null {
-        return this.melodyDatabase.get(id);
-    }
-
-    public getMelodies() {
-        return this.melodyDatabase.getAll();
-    }
-
-    public getMelodiesIndex() {
-        return this.melodyDatabase.getIndex();
     }
 }

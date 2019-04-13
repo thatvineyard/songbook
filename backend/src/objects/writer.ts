@@ -8,7 +8,7 @@
 
 // stanza types: verse, chorus, reference
 
-export class Artist {
+export class Writer {
 
   firstName: string;
   lastName: string;

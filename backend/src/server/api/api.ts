@@ -1,12 +1,12 @@
 import { Router } from "express";
 import serverConstants from "../../constants/serverConstants";
 import { ApiBuilder } from "./api-framework/api-builder";
-import { artistsApiBuilder } from "./artists-api";
+import { writersApiBuilder } from "./writer-api";
 import { melodiesApiBuilder } from "./melodies-api";
 import { songsApiBuilder } from "./songs-api";
 
 const songsUrl = "/songs";
-const artistsUrl = "/artists";
+const writersUrl = "/writers";
 const melodiesUrl = "/melodies";
 const apiInfoUrl = serverConstants.apiInfoUrl;
 
@@ -16,7 +16,7 @@ export function createApi(): Router {
   // Add subApis
   apiBuilder.subApi(songsUrl, songsApiBuilder);
   apiBuilder.subApi(melodiesUrl, melodiesApiBuilder);
-  apiBuilder.subApi(artistsUrl, artistsApiBuilder);
+  apiBuilder.subApi(writersUrl, writersApiBuilder);
 
   // Set settings
   apiBuilder.enableApiInfo(apiInfoUrl);

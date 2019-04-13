@@ -4,6 +4,7 @@ export class Parameter {
   parameterType: ParameterType;
   name: string;
   objectType: string;
+  description: string;
   required: boolean;
   dependencies: Parameter[];
 
@@ -11,11 +12,13 @@ export class Parameter {
     type: ParameterType,
     name: string,
     objectType: string,
+    description?: string,
     required?: boolean
   ) {
     this.parameterType = type;
     this.name = name;
     this.objectType = objectType;
+    this.description = description || "No description";
     this.required = required || false;
     this.dependencies = [];
   }

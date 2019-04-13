@@ -4,36 +4,94 @@ import { Database } from "./database";
 import { SongModel, StanzaModel } from "../models/song-model";
 import { join } from "path";
 import { Entry } from "./entry";
+import { WriterDatabaseHandler } from "./writer-database-handler";
+import { WriterModel } from "../models/writer-model";
+import { write } from "fs";
+import { Melody } from "objects/melody";
 
-export function populateSongs(db: SongDatabaseHandler, numSongs: number, minHistory?: number, maxHistory?: number): void {
+
+export function populate(songDb: SongDatabaseHandler, writerDb: WriterDatabaseHandler, numEntries: number, minHistory?: number, maxHistory?: number): void {
+  populateWriters(writerDb, numEntries / 2, minHistory, maxHistory);
+  populateSongs(songDb, writerDb, numEntries, minHistory, maxHistory);
+}
+
+// WRITERS
+function populateWriters(db: WriterDatabaseHandler, numWriters: number, minHistory?: number, maxHistory?: number): void {
+  for (let i = 0; i < numWriters; i++) {
+    maxHistory = maxHistory || 0;
+    minHistory = minHistory || 0;
+    let repetitions = Math.floor(Math.random() * (maxHistory - minHistory + 1) + minHistory);
+
+    let writer = generateWriter();
+
+
+    let result: Entry<WriterModel> | null = db.post(writer);
+
+    if (result) {
+      let id: string = result.getId();
+      // create revisions
+      for (let j = 0; j < repetitions; j++) {
+        let writer = generateWriter();
+        db.put(id, writer);
+      }
+    }
+  }
+}
+
+function generateWriter(): WriterModel {
+  return new WriterModel(generateName(), generateName());
+}
+
+function generateName(): string {
+  var randomWords = require('random-words');
+  return capitalizeFirstLetter(randomWords(1)[0]);
+}
+
+function getRandomWriter(writerDb: WriterDatabaseHandler): string {
+  let writerIndex = writerDb.getIndex();
+
+  let index = Math.floor(Math.random() * writerIndex.length);
+
+  return writerIndex[index];
+}
+
+// SONGS
+
+function populateSongs(songDb: SongDatabaseHandler, writerDb: WriterDatabaseHandler, numSongs: number, minHistory?: number, maxHistory?: number): void {
   for (let i = 0; i < numSongs; i++) {
     maxHistory = maxHistory || 0;
     minHistory = minHistory || 0;
     let repetitions = Math.floor(Math.random() * (maxHistory - minHistory + 1) + minHistory);
 
     // create first song
-    let song = generateRandomSong();
-    let result: Entry<SongModel> | null = db.post(song);
+    let songModel = generateSong(getRandomWriter(writerDb));
+    let result: Entry<SongModel> | null = songDb.post(songModel);
 
     if (result) {
       let id: string = result.getId();
       // create revisions
       for (let j = 0; j < repetitions; j++) {
-        let song = generateRandomSong();
-        db.put(id, song);
+        let song = generateSong(getRandomWriter(writerDb));
+        songDb.put(id, song);
       }
     }
   }
 }
 
-export function generateRandomSong(): SongModel {
-  var randomWords = require('random-words');
-  return new SongModel(
-    capitalizeEveyFirstLetter(randomWords({ min: 1, max: 7 })).join(' '),
-    namify(randomWords({ min: 2, max: 3 })),
-    capitalizeEveyFirstLetter(randomWords({ min: 2, max: 4 })).join(' '),
-    generateStanzas()
+
+export function generateSong(writerRef: string, melodyRef: string = "melody-0"): SongModel {
+  let song = new SongModel(
+    generateSongTitle()
   );
+  song.writerRef = writerRef;
+  song.melodyRef = melodyRef;
+  song.stanzas = generateStanzas();
+  return song;
+}
+
+function generateSongTitle(): string {
+  var randomWords = require('random-words');
+  return capitalizeEveyFirstLetter(randomWords({ min: 1, max: 7 })).join(' ');
 }
 
 function generateStanzas(): StanzaModel[] {
@@ -69,8 +127,9 @@ function generateNewStanza(): StanzaModel {
   return new StanzaModel(stanzaType, lines);
 }
 
-function capitalizeFirstLetter(string: string): string {
-  return string[0].toUpperCase() + string.slice(1);
+// UTILS
+function capitalizeFirstLetter(str: string): string {
+  return str[0].toUpperCase() + str.slice(1);
 }
 
 function capitalizeEveyFirstLetter(stringArray: string[]): string[] {
