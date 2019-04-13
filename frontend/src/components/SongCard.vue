@@ -29,20 +29,7 @@
             </p>
           </div>
         </div>
-        <div id='lyrics'>
-          <div
-            class='stanza'
-            v-for='(stanza, index) in song.stanzas'
-            :key="`stanza-${index}`"
-          >
-            <h4 class='lyrics-teaser'>{{stanza.type}}</h4>
-            <p
-              class='lyrics-teaser'
-              v-for='line in stanza.lines'
-              :key='line'
-            > {{line}} </p>
-          </div>
-        </div>
+        <LyricsVue v-bind:song="song" />
       </div>
       <div class="fade">
       </div>
@@ -53,10 +40,14 @@
 <script lang="ts">
 import axios from 'axios';
 import urlJoin from 'url-join';
+import LyricsVue from './Lyrics.vue';
 
 export default {
   name: 'song-card',
   props: { songId: String, preview: String },
+  components: {
+    LyricsVue,
+  },
   data() {
     return {
       song: undefined,
@@ -88,10 +79,9 @@ export default {
   clear: both;
 }
 .wrapper {
-  border-radius: 10px 10px 0px 0px;
+  border-radius: 10px 10px 10px 10px;
   width: 100%;
-  margin: auto;
-  margin-top: 1%;
+  margin: 5px auto 5px;
   position: relative;
   overflow: hidden;
   box-shadow: 0px -20px 30px rgba(0, 0, 0, 0.1);
@@ -99,40 +89,64 @@ export default {
     (max-height: $break-small-vert) {
     box-shadow: unset;
   }
-  transform: scale(0.98);
-  transition: transform 0.5s, box-shadow 0.5s;
-  &:hover {
-    @media screen and (min-height: $break-small-vert or
-      (min-width: $break-small-horiz)) {
-      transform: scale(1) translate(0, -30px);
-      box-shadow: 0px -30px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    & .container div .bottom #lyrics .stanza .lyrics-preview {
-      opacity: 1;
+  // transform: scale(0.98);
+  transform: scale(1);
+  transition: transform 0.5s ease-in-out, box-shadow 0.5s;
+  &.preview {
+    &:hover {
+      @media screen and (min-width: $break-small-horiz) and (min-height: $break-small-vert) {
+        transform: translate(0, -10px);
+        box-shadow: 0px -20px 30px rgba(0, 0, 0, 0.2);
+      }
     }
   }
+  &.no-preview {
+    border-radius: 10px;
+    & .fade,
+    #fog,
+    #lyrics {
+      display: none;
+    }
 
-  // Change container
-  &:hover .container {
-    @media screen and (max-width: $break-small-horiz) {
-      // max-height: $card-hover-height-small;
-    }
-    @media screen and (max-height: $break-small-vert) {
-      // max-height: $card-hover-height-small;
-    }
-    @media screen and (min-height: $break-small-vert or
+    &:hover {
+      @media screen and (min-height: $break-small-vert and
       (min-width: $break-small-horiz)) {
-      max-height: $card-hover-height-normal;
+        transform: scale(1) translate(0, -30px);
+      }
+    }
+    & input:checked ~ .container {
+      & #lyrics {
+        display: unset;
+      }
     }
   }
   & input:checked ~ .container {
-    max-height: 1000px;
+    max-height: 10000px;
     & #fog {
       opacity: 0;
     }
+    & .fade {
+      opacity: 0;
+    }
   }
+
+  .fade {
+    box-shadow: 0px 0px 0px rgba(89, 92, 98, 0);
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    height: 20px;
+    z-index: 100;
+    transition: opacity 0.5s;
+    background-image: linear-gradient(
+      to bottom,
+      $card-body 0%,
+      $background 50%
+    );
+  }
+
   & input {
+    margin: 0;
     opacity: 0;
     z-index: 10;
     height: 100%;
@@ -152,9 +166,11 @@ export default {
     @media screen and (max-height: $break-small-vert) {
       max-height: $card-idle-height-small;
     }
-    max-height: $card-idle-height-normal;
+    @media screen and (min-height: $break-small-vert) and (min-width: $break-small-horiz) {
+      max-height: $card-idle-height-normal;
+    }
     min-height: 0;
-    transition: max-height 0.3s, min-height 0.3s;
+    transition: max-height 0.5s, min-height 0.5s;
 
     &.no-preview {
       border-radius: 10px 10px 10px 10px;
@@ -173,7 +189,7 @@ export default {
       .title {
         display: block;
         text-align: left;
-
+        margin: auto auto auto 0;
         padding-left: 10px;
         width: 80%;
       }
@@ -246,9 +262,7 @@ export default {
       }
 
       & #info {
-        padding-left: 10%;
-        padding-right: 10%;
-        padding-bottom: 10px;
+        padding: 0 10%;
         display: flex;
         flex-wrap: wrap;
         & div {
@@ -258,12 +272,9 @@ export default {
           }
           & p {
             margin: auto;
-            // margin-left: 2px;
           }
           display: flex;
           align-content: center;
-          // min-width: 200px;
-          // width: 30%;
           text-align: center;
           margin: auto;
           padding-bottom: 10px;
@@ -271,62 +282,7 @@ export default {
           padding-right: 10px;
         }
       }
-      & #lyrics {
-        font-size: 1em;
-        text-align: left;
-        width: 96%;
-        padding-bottom: 20px;
-        position: relative;
-        overflow: hidden;
-        text-overflow: clip;
-
-        & .stanza {
-          & h4 {
-            padding-left: 10%;
-            text-align: left;
-            font-size: 1em;
-            margin: 0;
-            font-style: italic;
-            font-weight: bold;
-          }
-          & p {
-            text-align: left;
-            padding-left: 20%;
-          }
-          margin-top: 10px;
-          padding-bottom: 20px;
-        }
-      }
     }
-  }
-  &.no-preview {
-    border-radius: 10px;
-    & .fade,
-    #fog,
-    #lyrics {
-      display: none;
-    }
-    &:hover {
-      transform: scale(1) translate(0, 0px);
-      box-shadow: 0px -30px 30px rgba(0, 0, 0, 0.3);
-    }
-    & input:checked ~ .container {
-      max-height: 1000px;
-      min-height: 500px;
-      & #lyrics {
-        display: unset;
-      }
-    }
-  }
-
-  .fade {
-    box-shadow: 0px 0px 0px rgba(89, 92, 98, 0);
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    height: 20px;
-    z-index: 100;
-    background-image: linear-gradient(to bottom, $card-body, $background);
   }
 }
 </style>

@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: $background;
+    @media screen and (max-width: $break-small-horiz),
+    (max-height: $break-small-vert) {
+    font-size: 0.8em;
+  }
+}
+
+h1,
+h2, h3, h4, h5, h6 {
+  font-family: "Lato", Arial;
+  font-weight: bold;
+  font-variant: small-caps;
+}
+
+h1 {
+font-size: 1.4em;
+  letter-spacing: 4px;
+}
+h2 {
+font-size: 1.2em;
+  letter-spacing: 2px;
+}

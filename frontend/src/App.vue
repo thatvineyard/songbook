@@ -2,6 +2,10 @@
   <div id="app">
     <NavBar v-bind:links="links" />
     <div id="content">
+      <DashboardVue v-bind:settings="[
+    {name: 'Preview'}, {name: 'Animation'}, {name: 'Setting #3'}
+    ]" />
+      <LineBreakVue v-bind:margin="'40px'" />
       <SongList />
     </div>
   </div>
@@ -10,12 +14,16 @@
 <script>
 import SongList from './components/SongList.vue';
 import NavBar from './components/layout/NavBar.vue';
+import DashboardVue from './components/layout/Dashboard.vue';
+import LineBreakVue from './components/layout/LineBreak.vue';
 
 export default {
   name: 'app',
   components: {
     SongList,
     NavBar,
+    DashboardVue,
+    LineBreakVue,
   },
   mounted() {},
   data() {
@@ -28,19 +36,10 @@ export default {
         },
         left: [
           { name: 'About', ref: '/about' },
-          {
-            name: 'About',
-            ref: '/about',
-          },
+          { name: 'About', ref: '/about' },
           { name: 'About', ref: '/about' },
         ],
         right: [
-          { name: 'About', ref: '/about' },
-          { name: 'About', ref: '/about' },
-          { name: 'About', ref: '/about' },
-          { name: 'About', ref: '/about' },
-          { name: 'About', ref: '/about' },
-          { name: 'About', ref: '/about' },
           { name: 'About', ref: '/about' },
           { name: 'About', ref: '/about' },
           { name: 'About', ref: '/about' },
@@ -52,37 +51,18 @@ export default {
 </script>
 
 <style lang="scss">
-body {
-  margin: 0;
-  padding: 0;
-  background: $background;
-  // color: #cdcdcd;
-  font-family: "Times", "Avenir", sans-serif;
-}
-
-h1,
-h2 {
-  font-family: "Lato", Arial;
-  font-weight: bold;
-  font-size: 1.4em;
-  letter-spacing: 2px;
-  font-variant: small-caps;
-}
+@import "./styles/base-settings.scss";
 
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: left;
-  margin-top: 60px;
 }
 
 #content {
+  padding-top: 80px;
   max-width: $content-max-width;
   margin: auto;
-  @media screen and (max-width: $break-small-horiz),
-    (max-height: $break-small-vert) {
-    font-size: 0.8em;
-  }
 }
 </style>

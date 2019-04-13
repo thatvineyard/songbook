@@ -3,15 +3,11 @@
     class="song-list"
     v-if="songs"
   >
-    <DashboardVue v-bind:settings="[
-    {name: 'Preview'}, {name: 'Animation'}, {name: 'Setting #3'}
-    ]" />
-    <LineBreakVue v-bind:margin="'40px'" />
     <SongCardVue
       v-for="songId in songs"
       :key="songId"
       v-bind:songId='songId'
-      v-bind:preview='"no-preview"'
+      v-bind:preview='"preview"'
     />
   </div>
 </template>
@@ -21,15 +17,11 @@
 import axios from 'axios';
 import urlJoin from 'url-join';
 import SongCardVue from './SongCard.vue';
-import DashboardVue from './layout/Dashboard.vue';
-import LineBreakVue from './layout/LineBreak.vue';
 
 export default {
   name: 'song-list',
   components: {
     SongCardVue,
-    DashboardVue,
-    LineBreakVue,
   },
 
   data() {
@@ -56,9 +48,9 @@ export default {
 
 <style lang="scss" scoped>
 .song-list {
-  padding-top: 20px;
+  // padding-top: 20px;
   width: 80%;
   min-width: 300px;
-  margin: auto;
+  margin: 0px auto;
 }
 </style>
