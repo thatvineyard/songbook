@@ -1,16 +1,23 @@
-import { Song, Stanza } from '../objects/song'
+import { Song, Stanza } from '../objects/song';
+import { Model } from './model';
 
-export class SongModel {
+export class SongModel implements Model {
 
   title: string | undefined;
-  writerDisplayName: string | undefined;
+  writer: Writer | undefined;
   writerRef: string | undefined;
   melody: string | undefined;
   melodyRef: string | undefined;
   stanzas: StanzaModel[] | undefined;
   languageCode: string | undefined;
 
-  constructor(title?: string, writerRef?: string, melodyRef?: string, writerDisplayName?: string, melody?: string, stanzas?: StanzaModel[], languageCode?: string) {
+  constructor(title?: string,
+    writerRef?: string,
+    melodyRef?: string,
+    writerDisplayName?: string,
+    melody?: string,
+    stanzas?: StanzaModel[],
+    languageCode?: string) {
     this.title = title;
     this.writerDisplayName = writerDisplayName;
     this.writerRef = writerRef;
@@ -18,6 +25,12 @@ export class SongModel {
     this.melodyRef = melodyRef;
     this.stanzas = stanzas;
     this.languageCode = languageCode || 'en';
+  }
+
+  public toDereference(): string[] {
+    const variables: string[] = Object.keys(this);
+
+    console.log(variables);
   }
 }
 

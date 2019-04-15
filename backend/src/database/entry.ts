@@ -1,5 +1,5 @@
-import { randomBytes } from "crypto";
-import { Id, IdGenerator } from "./id";
+import { randomBytes } from 'crypto';
+import { Id, IdGenerator } from './id';
 
 export class Entry<T extends object> {
   id: Id;
@@ -14,7 +14,7 @@ export class Entry<T extends object> {
     if (entryData != null) {
       this.type = entryData.constructor.name;
     } else {
-      this.type = "null";
+      this.type = 'null';
     }
     this.id = idGenerator.generate();
     this.revision = 1;
@@ -27,9 +27,9 @@ export class Entry<T extends object> {
     if (newEntryData != null) {
       this.type = newEntryData.constructor.name;
     } else {
-      this.type = "null";
+      this.type = 'null';
     }
-    this.revision++;
+    this.revision += 1;
     this.lastModified = new Date();
   }
 

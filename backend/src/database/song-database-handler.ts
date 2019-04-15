@@ -1,44 +1,39 @@
 import { Database } from './database';
-import { Song, Stanza } from "../objects/song";
-import { SongModel, StanzaModel } from "../models/song-model";
-import { Entry } from "./entry";
+import { Song, Stanza } from '../objects/song';
+import { SongModel, StanzaModel } from '../models/song-model';
+import { Entry } from './entry';
 
 export class SongDatabaseHandler {
-  private static _instance: SongDatabaseHandler;
+  private static INSTANCE: SongDatabaseHandler;
 
   private songDatabase: Database<Song>;
 
   private constructor() {
-    this.songDatabase = new Database<Song>("song");
+    this.songDatabase = new Database<Song>('song');
   }
 
   public static get Instance() {
-    return this._instance || (this._instance = new this());
+    return this.INSTANCE || (this.INSTANCE = new this());
   }
 
   // SONG
   public post(songModel: SongModel): Entry<SongModel> | null {
-    let song = this.songModelToObject(songModel);
+    const song = this.songModelToObject(songModel);
 
     if (!song) {
       return null;
     }
 
-
-    console.log("POST")
-    console.log(song)
-
     // do
-    let result: Entry<Song> | null = this.songDatabase.post(song);
+    const result: Entry<Song> | null = this.songDatabase.post(song);
 
     // convert to model
     return this.songToModelInEntry(result);
   }
 
-
   public put(
     id: string,
-    songModel: SongModel
+    songModel: SongModel,
   ): Entry<SongModel> | null {
     if (!this.songDatabase.has(id)) {
       return null;
@@ -48,21 +43,20 @@ export class SongDatabaseHandler {
     this.songDatabase.saveRevision(id);
 
     // convert to object
-    let song = this.songModelToObject(songModel);
+    const song = this.songModelToObject(songModel);
 
     if (!song) {
       return null;
     }
 
     // do
-    let result: Entry<Song> | null = this.songDatabase.put(id, song);
+    const result: Entry<Song> | null = this.songDatabase.put(id, song);
 
     // convert to model
     if (result) {
       return this.songToModelInEntry(result);
-    } else {
-      return null;
     }
+    return null;
 
   }
 
@@ -70,12 +64,12 @@ export class SongDatabaseHandler {
     id: string,
     title?: string,
     artist?: string,
-    melody?: string
+    melody?: string,
   ): Entry<SongModel> | null {
     if (this.songDatabase.has(id)) {
-      let entry = this.songDatabase.get(id);
+      const entry = this.songDatabase.get(id);
       if (entry) {
-        let song: Song = entry.entryData as Song;
+        const song: Song = entry.entryData as Song;
         this.songDatabase.saveRevision(id);
         if (title) {
           song.title = title;
@@ -86,7 +80,7 @@ export class SongDatabaseHandler {
         if (melody) {
           song.melody = melody;
         }
-        let result: Entry<Song> | null = this.songDatabase.put(id, song);
+        const result: Entry<Song> | null = this.songDatabase.put(id, song);
         if (result) {
           return this.songToModelInEntry(result);
         }
@@ -98,7 +92,7 @@ export class SongDatabaseHandler {
   public delete(id: string): Entry<SongModel> | null {
     if (this.songDatabase.has(id)) {
       this.songDatabase.saveRevision(id);
-      let result = this.songDatabase.delete(id);
+      const result = this.songDatabase.delete(id);
       if (result) {
         return this.songToModelInEntry(result);
       }
@@ -111,21 +105,19 @@ export class SongDatabaseHandler {
   }
 
   public get(id: string): Entry<SongModel> | null {
-    let result: Entry<Song> | null = this.songDatabase.get(id) as Entry<Song>;
-
-    console.log("GET")
-    console.log(result);
+    const result: Entry<Song> | null = this.songDatabase.get(id) as Entry<Song>;
 
     // convert to model
     if (result) {
       return this.songToModelInEntry(result);
-    } else {
-      return null;
     }
+
+    return null;
+
   }
 
   public getAll(): Entry<SongModel>[] {
-    let result: Entry<Song>[] = this.songDatabase.getAll();
+    const result: Entry<Song>[] = this.songDatabase.getAll();
 
     return result.map((entry: Entry<Song>) => {
       return this.songToModelInEntry(entry);
@@ -137,12 +129,10 @@ export class SongDatabaseHandler {
   }
 
   public recoverRevision(id: string, revision: number) {
-    let result = this.songDatabase.recoverRevision(id, revision);
+    const result = this.songDatabase.recoverRevision(id, revision);
 
     if (result) {
       return this.songToModelInEntry(result);
-    } else {
-      return null;
     }
   }
 
@@ -151,7 +141,7 @@ export class SongDatabaseHandler {
   }
 
   public recoverAllRevisions(id: string): Entry<SongModel>[] {
-    let result = this.songDatabase.recoverAllRevisions(id);
+    const result = this.songDatabase.recoverAllRevisions(id);
 
     return result.map((entry: Entry<Song>) => {
       return this.songToModelInEntry(entry);
@@ -168,14 +158,14 @@ export class SongDatabaseHandler {
       return null;
     }
 
-    let stanzaModel = new StanzaModel(stanza.type, stanza.lines);
+    const stanzaModel = new StanzaModel(stanza.type, stanza.lines);
 
     return stanzaModel;
   }
 
   public stanzaArrayToModelArray(stanzas: Stanza[]): StanzaModel[] {
-    let stanzaModels: StanzaModel[] = stanzas.reduce((results: StanzaModel[], stanza: Stanza) => {
-      let stanzaModel = this.stanzaToModel(stanza);
+    const stanzaModels: StanzaModel[] = stanzas.reduce((results: StanzaModel[], stanza: Stanza) => {
+      const stanzaModel = this.stanzaToModel(stanza);
       if (!stanzaModel) {
         return results;
       }
@@ -190,28 +180,23 @@ export class SongDatabaseHandler {
       return null;
     }
 
-    let songModel = new SongModel(song.title);
+    const songModel = new SongModel(song.title);
     songModel.melodyRef = song.melody;
     songModel.writerRef = song.artist;
     // songModel.writerRef = song.artist;
 
-    let stanzaModel = this.stanzaArrayToModelArray(song.stanzas);
+    const stanzaModel = this.stanzaArrayToModelArray(song.stanzas);
 
     songModel.stanzas = song.stanzas;
     return songModel;
   }
 
-
   private songToModelInEntry(entry: Entry<Song>): Entry<SongModel> {
-    console.log("SHOULD BE OBJECT")
-    console.log(entry);
-    let newEntry: Entry<T> = Object.assign(
+    const newEntry: Entry<Object> = Object.assign(
       Object.create(entry),
-      entry
+      entry,
     ) as Entry<Object>;
     newEntry.entryData = this.songToModel(entry.entryData);
-    console.log("SHOULD BE MODEL")
-    console.log(newEntry);
     return newEntry as Entry<SongModel>;
   }
 
@@ -223,8 +208,8 @@ export class SongDatabaseHandler {
   }
 
   private stanzaModelArrayToObjectArray(stanzaModels: StanzaModel[]): Stanza[] {
-    let stanzas: Stanza[] = stanzaModels.reduce((results: Stanza[], stanzaModel: StanzaModel) => {
-      let stanza = this.stanzaModelToObject(stanzaModel);
+    const stanzas: Stanza[] = stanzaModels.reduce((results: Stanza[], stanzaModel: StanzaModel) => {
+      const stanza = this.stanzaModelToObject(stanzaModel);
       if (!stanza) {
         return results;
       }
@@ -239,7 +224,7 @@ export class SongDatabaseHandler {
       return null;
     }
 
-    let stanzas = this.stanzaModelArrayToObjectArray(songModel.stanzas);
+    const stanzas = this.stanzaModelArrayToObjectArray(songModel.stanzas);
 
     if (!stanzas) {
       return null;

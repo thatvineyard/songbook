@@ -1,3 +1,5 @@
+import { Model } from './model';
+
 // object file for songs
 // metadata
 //   metadata: title, artistRef, melodyRef
@@ -8,7 +10,7 @@
 
 // stanza types: verse, chorus, reference
 
-export class WriterModel {
+export class WriterModel implements Model {
 
   firstName: string;
   lastName: string;

@@ -1,5 +1,4 @@
 
-
 // object file for songs
 // metadata
 //   metadata: title, artistRef, melodyRef
@@ -18,7 +17,12 @@ export class Song {
   languageCode: string;
   original: boolean;
 
-  constructor(title: string, artist: string, melody: string, stanzas?: Stanza[], languageCode?: string, original: boolean = false) {
+  constructor(title: string,
+              artist: string,
+              melody: string,
+              stanzas?: Stanza[],
+              languageCode?: string,
+              original: boolean = false) {
     this.title = title;
     this.artist = artist;
     this.melody = melody;
