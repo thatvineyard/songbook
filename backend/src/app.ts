@@ -1,7 +1,9 @@
-import { Server } from "./server/server";
-import { DatabaseHandler } from "./database/database-handler";
+import { Server } from './server/server';
+import { DatabaseManager } from './database/database-manager';
+import { populate } from './database/populate';
 
-let db = DatabaseHandler.Instance;
+const db = DatabaseManager.Instance;
+populate(db, 2, 0, 0);
 
-let server = new Server();
+const server = new Server();
 server.start();

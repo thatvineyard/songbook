@@ -1,39 +1,52 @@
-import { EntryModel } from "../models/entry-model";
-import { SongModel } from "../models/song-model";
-import { WriterModel } from "../models/writer-model";
-import { Writer } from "../objects/writer";
-import { Melody } from "../objects/melody";
+import { EntryModel } from '../models/entry-model';
+import { SongModel } from '../models/song-model';
+import { WriterModel } from '../models/writer-model';
+import { Writer } from '../objects/writer';
+import { Melody } from '../objects/melody';
 import { Database } from './database';
-import { Entry } from "./entry";
-import { populate } from "./populate";
-import { SongDatabaseHandler } from "./song-database-handler";
-import { WriterDatabaseHandler } from './writer-database-handler';
+import { Entry } from './entry';
+import { populate } from './populate';
+import { SongDatabaseAccessor, SONG_DATABASE_NAME } from './song-database-accessor';
+import { WriterDatabaseAccessor, WRITER_DATABASE_NAME } from './writer-database-accessor';
+import { Model } from 'models/model';
+import { Song } from 'objects/song';
+
+const DEFAULT_DEREFERENCE: boolean = true;
 
 /**
- * This class is the main entrypoint for all database actions. 
- * It is mostly responsible for sending requests to the appropriate database handler 
- * as well as creating models of the entry that is returned. 
+ * This class is the main entrypoint for all database actions.
+ * It is mostly responsible for sending requests to the appropriate database handler
+ * as well as creating models of the entry that is returned.
  * The data in the entry should already be modelled by the individual database handler.
- * 
- * 
+ *
+ *
  */
-export class DatabaseHandler {
-  private static INSTANCE: DatabaseHandler;
+export class DatabaseManager {
+  private static INSTANCE: DatabaseManager;
 
-  private songDatabase: SongDatabaseHandler;
+  private songDatabase: SongDatabaseAccessor;
   // private melodyDatabase: Database<Melody>;
-  private writerDatabase: WriterDatabaseHandler;
+  private writerDatabase: WriterDatabaseAccessor;
 
   private constructor() {
-    this.songDatabase = SongDatabaseHandler.Instance;
+    this.songDatabase = SongDatabaseAccessor.Instance;
     // this.melodyDatabase = MelodyDatabaseHandler.Instance;
-    this.writerDatabase = WriterDatabaseHandler.Instance;
-
-    populate(this.songDatabase, this.writerDatabase, 2, 0, 0);
+    this.writerDatabase = WriterDatabaseAccessor.Instance;
   }
 
   public static get Instance() {
     return this.INSTANCE || (this.INSTANCE = new this());
+  }
+
+  // GENERIC
+  public get(id: string): EntryModel<Model> | null {
+    if (this.hasSong(id)) {
+      return this.getSong(id);
+    }
+    if (this.hasWriter(id)) {
+      return this.getWriter(id);
+    }
+    return null;
   }
 
   // SONG
@@ -55,7 +68,7 @@ export class DatabaseHandler {
     id: string,
     title?: string,
     writer?: string,
-    melody?: string,
+    melody ?: string,
   ): EntryModel<SongModel> | null {
     const result: Entry<SongModel> | null = this.songDatabase.patch(id, title, writer, melody);
     return this.entryToModel(result);
@@ -82,7 +95,7 @@ export class DatabaseHandler {
         results.push(result);
       }
       return results;
-    }, [] as EntryModel<SongModel>[]);
+    },                   [] as EntryModel<SongModel>[]);
   }
 
   public getSongsIndex() {
@@ -111,7 +124,7 @@ export class DatabaseHandler {
         results.push(result);
       }
       return results;
-    }, [] as EntryModel<SongModel>[]);
+    },                   [] as EntryModel<SongModel>[]);
   }
 
   public purgeSong(id: string) {
@@ -120,7 +133,7 @@ export class DatabaseHandler {
 
   // Writer
   public postWriter(writerModel: WriterModel): EntryModel<WriterModel> | null {
-    const result: Entry<WriterModel> | null = this.writerDatabase.post(writerModel);
+    const result: Entry<WriterModel> | null =                          this.writerDatabase.post(writerModel);
     return this.entryToModel(result);
   }
 
@@ -140,15 +153,23 @@ export class DatabaseHandler {
     return this.writerDatabase.has(id);
   }
 
-  public getWriter(id: string): Entry<Writer> | null {
-    return this.writerDatabase.get(id);
+  public getWriter(id: string): EntryModel<WriterModel> | null {
+    const result: Entry<WriterModel> | null = this.writerDatabase.get(id);
+    return this.entryToModel(result);
   }
 
-  public getWriters() {
-    return this.writerDatabase.getAll();
+  public getWriters(): EntryModel<WriterModel>[] {
+    const result: Entry<WriterModel>[] = this.writerDatabase.getAll();
+    return result.reduce((results, entry: Entry<WriterModel>) => {
+      const result = this.entryToModel(entry);
+      if (result) {
+        results.push(result);
+      }
+      return results;
+    },                   [] as EntryModel<WriterModel>[]);
   }
 
-  public getWritersIndex() {
+  public getWritersIndex(): string[] {
     return this.writerDatabase.getIndex();
   }
 
@@ -179,6 +200,19 @@ export class DatabaseHandler {
   // }
 
   // UTILS
+  private existsIn(id: string): string[] {
+    const result: string[] = [];
+
+    if (this.hasSong(id)) {
+      result.push(SONG_DATABASE_NAME);
+    }
+    if (this.hasWriter(id)) {
+      result.push(WRITER_DATABASE_NAME);
+    }
+
+    return result;
+  }
+
   private dereferenceModel<T extends Object>(entry: Entry<T>): void {
     console.log();
   }
@@ -193,6 +227,5 @@ export class DatabaseHandler {
                                entry.entryData);
     }
     return null;
-
   }
 }

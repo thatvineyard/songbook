@@ -20,12 +20,22 @@ export class WriterModel implements Model {
     this.lastName = lastName;
   }
 
-  // function addStanza (type: String, arrayOfLines) {
-  //     this.type = type;
-  //     this.arrayOfLines = arrayOfLines;
-  // }
+  public toDereference(): string[] {
+    const variables: string[] = Object.keys(this);
 
-  // function getLyrics () {
-  //     return arrayOfLines.
-  // }
+    console.log(variables);
+    return [];
+  }
+
+  public getReference(ley: string): string {
+    return '';
+  }
+
+  public getDereferenceType(key: string): string {
+    return '';
+  }
+
+  public dereference(key: string, data: object): void {
+    //
+  }
 }

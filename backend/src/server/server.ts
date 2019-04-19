@@ -1,8 +1,8 @@
-import express, { Express } from "express";
-import { createApi } from "./api/api";
+import express, { Express } from 'express';
+import { createApi } from './api/api';
 import colors from 'colors';
-import serverConstants from "../constants/serverConstants";
-import bodyParser = require("body-parser");
+import serverConstants from '../constants/serverConstants';
+import bodyParser = require('body-parser');
 
 // App
 export class Server {
@@ -11,14 +11,14 @@ export class Server {
   constructor() {
     this.express = express();
     this.express.use(bodyParser.json());
-    this.express.use("/", createApi());
+    this.express.use('/', createApi());
   }
 
   start() {
     this.express.listen(serverConstants.port);
-    console.log(colors.cyan("# Server startup"));
+    console.log(colors.cyan('# Server startup'));
     console.log(
-      `Running on http://${serverConstants.host}:${serverConstants.port}`
+      `Running on http://${serverConstants.host}:${serverConstants.port}`,
     );
   }
 }

@@ -1,31 +1,34 @@
 import { Database } from './database';
-import { Writer } from "../objects/writer";
-import { WriterModel } from "../models/writer-model";
-import { Entry } from "./entry";
+import { Writer } from '../objects/writer';
+import { WriterModel } from '../models/writer-model';
+import { Entry } from './entry';
 import { lstat, write } from 'fs';
+import { DatabaseAccessor } from './database-accessor';
 
-export class WriterDatabaseHandler {
-  private static _instance: WriterDatabaseHandler;
+export const WRITER_DATABASE_NAME: string = 'writer';
+
+export class WriterDatabaseAccessor implements DatabaseAccessor<WriterModel> {
+  private static INSTANCE: WriterDatabaseAccessor;
 
   private writerDatabase: Database<Writer>;
 
   private constructor() {
-    this.writerDatabase = new Database<Writer>("writer");
+    this.writerDatabase = new Database<Writer>(WRITER_DATABASE_NAME);
   }
 
   public static get Instance() {
-    return this._instance || (this._instance = new this());
+    return this.INSTANCE || (this.INSTANCE = new this());
   }
 
   // Writer
   public post(writerModel: WriterModel): Entry<WriterModel> | null {
-    let writer = this.writerModelToObject(writerModel);
+    const writer = this.writerModelToObject(writerModel);
 
     if (!writer) {
       return null;
     }
     // do
-    let result: Entry<Writer> | null = this.writerDatabase.post(writer);
+    const result: Entry<Writer> | null = this.writerDatabase.post(writer);
 
     // convert to model
     return this.writerToModelInEntry(result);
@@ -33,7 +36,7 @@ export class WriterDatabaseHandler {
 
   public put(
     id: string,
-    writerModel: WriterModel
+    writerModel: WriterModel,
   ): Entry<WriterModel> | null {
     if (this.writerDatabase.has(id)) {
       return null;
@@ -41,14 +44,14 @@ export class WriterDatabaseHandler {
     this.writerDatabase.saveRevision(id);
 
     // convert to object
-    let writer = this.writerModelToObject(writerModel);
+    const writer = this.writerModelToObject(writerModel);
 
     if (!writer) {
       return null;
     }
 
     // do
-    let result: Entry<Writer> | null = this.writerDatabase.put(id, writer);
+    const result: Entry<Writer> | null = this.writerDatabase.put(id, writer);
 
     // convert to model
     if (!result) {
@@ -63,9 +66,9 @@ export class WriterDatabaseHandler {
     lastName?: string,
   ): Entry<WriterModel> | null {
     if (this.writerDatabase.has(id)) {
-      let entry = this.writerDatabase.get(id);
+      const entry = this.writerDatabase.get(id);
       if (entry) {
-        let writer: Writer = entry.entryData as Writer;
+        const writer: Writer = entry.entryData as Writer;
         this.writerDatabase.saveRevision(id);
         if (firstName) {
           writer.firstName = firstName;
@@ -73,7 +76,7 @@ export class WriterDatabaseHandler {
         if (lastName) {
           writer.lastName = lastName;
         }
-        let result: Entry<Writer> | null = this.writerDatabase.put(id, writer);
+        const result: Entry<Writer> | null = this.writerDatabase.put(id, writer);
         if (result) {
           return this.writerToModelInEntry(result);
         }
@@ -85,7 +88,7 @@ export class WriterDatabaseHandler {
   public delete(id: string): Entry<WriterModel> | null {
     if (this.writerDatabase.has(id)) {
       this.writerDatabase.saveRevision(id);
-      let result = this.writerDatabase.delete(id);
+      const result = this.writerDatabase.delete(id);
       if (result) {
         return this.writerToModelInEntry(result);
       }
@@ -98,18 +101,18 @@ export class WriterDatabaseHandler {
   }
 
   public get(id: string): Entry<WriterModel> | null {
-    let result: Entry<Writer> | null = this.writerDatabase.get(id) as Entry<Writer>;
+    const result: Entry<Writer> | null = this.writerDatabase.get(id) as Entry<Writer>;
 
     // convert to model
     if (result) {
       return this.writerToModelInEntry(result);
-    } else {
-      return null;
     }
+    return null;
+
   }
 
   public getAll(): Entry<WriterModel>[] {
-    let result: Entry<Writer>[] = this.writerDatabase.getAll();
+    const result: Entry<Writer>[] = this.writerDatabase.getAll();
 
     return result.map((entry: Entry<Writer>) => {
       return this.writerToModelInEntry(entry);
@@ -121,13 +124,13 @@ export class WriterDatabaseHandler {
   }
 
   public recoverRevision(id: string, revision: number) {
-    let result = this.writerDatabase.recoverRevision(id, revision);
+    const result = this.writerDatabase.recoverRevision(id, revision);
 
     if (result) {
       return this.writerToModelInEntry(result);
-    } else {
-      return null;
     }
+    return null;
+
   }
 
   public dropRevision(id: string, revision: number): void {
@@ -135,7 +138,7 @@ export class WriterDatabaseHandler {
   }
 
   public recoverAllRevisions(id: string): Entry<WriterModel>[] {
-    let result = this.writerDatabase.recoverAllRevisions(id);
+    const result = this.writerDatabase.recoverAllRevisions(id);
 
     return result.map((entry: Entry<Writer>) => {
       return this.writerToModelInEntry(entry);
@@ -150,16 +153,15 @@ export class WriterDatabaseHandler {
   private writerToModel(writer: Writer | null): WriterModel | null {
     if (writer) {
       return new WriterModel(writer.firstName, writer.lastName);
-    } else {
-      return null;
     }
+    return null;
+
   }
 
   private writerToModelInEntry(entry: Entry<Writer>): Entry<WriterModel> {
     entry.entryData = this.writerToModel(entry.entryData);
     return entry as Entry<WriterModel>;
   }
-
 
   private writerModelToObject(writerModel: WriterModel): Writer | null {
     if (!writerModel.firstName || !writerModel.lastName) {

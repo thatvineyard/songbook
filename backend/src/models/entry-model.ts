@@ -24,7 +24,22 @@ export class EntryModel<T extends object> implements Model {
     this.entryData = entryData;
   }
 
-  public toDereference() {
+  public toDereference(): string[] {
+    const variables: string[] = Object.keys(this);
+
+    console.log(variables);
     return [];
+  }
+
+  public getReference(ley: string): string {
+    return '';
+  }
+
+  public getDereferenceType(key: string): string {
+    return '';
+  }
+
+  public dereference(key: string, data: object): void {
+    //
   }
 }

@@ -2,14 +2,17 @@ import { Database } from './database';
 import { Song, Stanza } from '../objects/song';
 import { SongModel, StanzaModel } from '../models/song-model';
 import { Entry } from './entry';
+import { DatabaseAccessor } from './database-accessor';
 
-export class SongDatabaseHandler {
-  private static INSTANCE: SongDatabaseHandler;
+export const SONG_DATABASE_NAME: string = 'song';
+
+export class SongDatabaseAccessor implements DatabaseAccessor<SongModel> {
+  private static INSTANCE: SongDatabaseAccessor;
 
   private songDatabase: Database<Song>;
 
   private constructor() {
-    this.songDatabase = new Database<Song>('song');
+    this.songDatabase = new Database<Song>(SONG_DATABASE_NAME);
   }
 
   public static get Instance() {
@@ -171,7 +174,7 @@ export class SongDatabaseHandler {
       }
       results.push(stanzaModel);
       return results;
-    }, [] as StanzaModel[]);
+    },                                                 [] as StanzaModel[]);
     return stanzaModels;
   }
 
@@ -215,7 +218,7 @@ export class SongDatabaseHandler {
       }
       results.push(stanza);
       return results;
-    }, [] as Stanza[]);
+    },                                            [] as Stanza[]);
     return stanzas;
   }
 

@@ -26,14 +26,14 @@ melodiesApiBuilder.addGet(
 
 // Function
 function getMelodiesIndex(req: Request, res: Response): void {
-  res.send(["m001", "m002", "m003"]);
+  res.send(['m001', 'm002', 'm003']);
 }
 
 // API
 melodiesApiBuilder.addGet(
   serverConstants.indexUrl,
   getMelodiesIndex,
-  "Get melody index"
+  'Get melody index'
 );
 
 /**
@@ -42,12 +42,12 @@ melodiesApiBuilder.addGet(
 
 // Function
 function getMelodiesAction(req: Request, res: Response): void {
-  res.send("Action performed");
+  res.send('Action performed');
 }
 
 // API
 melodiesApiBuilder.addGet(
   serverConstants.actionUrl,
   getMelodiesAction,
-  "Temporary action"
+  'Temporary action'
 );
